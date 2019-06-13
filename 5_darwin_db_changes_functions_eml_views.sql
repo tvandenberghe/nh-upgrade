@@ -28,70 +28,77 @@ ALTER FUNCTION fct_get_tax_hierarchy(integer, integer[])
  --DROP MATERIALIZED VIEW mv_eml;
  
 CREATE MATERIALIZED VIEW mv_eml AS 
- WITH 	 children_geographic_coverage AS (
+WITH children_geographic_coverage AS (
          SELECT c_1.id,
-            string_agg(DISTINCT countries.pref_label, ', '::text ORDER BY countries.pref_label) AS geographic_coverage,
+            string_agg(DISTINCT countries.country_pref_label_gn::text, ', '::text ORDER BY (countries.country_pref_label_gn::text)) AS geographic_coverage,
             min(s.gtu_location[0]) AS min_lat,
             min(s.gtu_location[1]) AS min_lon,
             max(s.gtu_location[0]) AS max_lat,
             max(s.gtu_location[1]) AS max_lon
-           FROM specimens s
-             JOIN collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text)
-			 JOIN mv_tag_to_country countries on countries.gtu_ref=s.gtu_ref
+           FROM darwin2.specimens s
+             JOIN darwin2.collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text)
+             JOIN darwin2.mv_tag_to_country countries ON countries.gtu_ref = s.gtu_ref
           WHERE c_1.publish_to_gbif = true
           GROUP BY c_1.id
-        ), specimen_info AS (
+        ), 
+     specimen_info AS (
          SELECT c_1.id,
             count(s.*) AS nb_spec,
-            array_agg(DISTINCT s.ig_num ORDER BY s.ig_num) AS ig_num
-           FROM specimens s
-             JOIN collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text)
+            array_agg(DISTINCT s.ig_num ORDER BY s.ig_num) AS ig_num,
+            string_agg(distinct taxon_level_name, ', ') as ranks
+           FROM darwin2.specimens s
+             JOIN darwin2.collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text)
           WHERE c_1.publish_to_gbif = true
           GROUP BY c_1.id
-        ), children_temporal_coverage AS (
+        ), 
+     children_temporal_coverage AS (
          SELECT c_1.id,
             min(
                 CASE
-                    WHEN s.gtu_from_date_mask = 0 THEN fct_mask_date(s.gtu_to_date, s.gtu_to_date_mask)
-                    ELSE fct_mask_date(s.gtu_from_date, s.gtu_from_date_mask)
+                    WHEN s.gtu_from_date_mask = 0 THEN darwin2.fct_mask_date(s.gtu_to_date, s.gtu_to_date_mask)
+                    ELSE darwin2.fct_mask_date(s.gtu_from_date, s.gtu_from_date_mask)
                 END) AS date_from,
             replace(max(replace(
                 CASE
-                    WHEN s.gtu_to_date_mask = 0 THEN fct_mask_date(s.gtu_from_date, s.gtu_from_date_mask)
-                    ELSE fct_mask_date(s.gtu_to_date, s.gtu_to_date_mask)
+                    WHEN s.gtu_to_date_mask = 0 THEN darwin2.fct_mask_date(s.gtu_from_date, s.gtu_from_date_mask)
+                    ELSE darwin2.fct_mask_date(s.gtu_to_date, s.gtu_to_date_mask)
                 END, 'xxxx-xx-xx'::text, '0000-00-00'::text)), '0000-00-00'::text, 'xxxx-xx-xx'::text) AS date_to
-           FROM specimens s
-             JOIN collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text) AND c_1.publish_to_gbif = true
+           FROM darwin2.specimens s
+             JOIN darwin2.collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text) AND c_1.publish_to_gbif = true
           GROUP BY c_1.id, c_1.name
           ORDER BY c_1.id
-        ), species_coverage AS (
+        ), 
+     species_coverage AS (
          SELECT c_1.id,
-            count(DISTINCT s.taxon_path) AS nb_species
-           FROM specimens s
-             JOIN collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text) AND c_1.publish_to_gbif = true /*AND s.is_marine = true*/
+           count(DISTINCT s.taxon_name) AS nb_species
+           FROM darwin2.specimens s
+           JOIN darwin2.collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text) AND c_1.publish_to_gbif = true
           GROUP BY c_1.id
-        ), classes_orders_coverage AS (
+        ), 
+     classes_orders_coverage AS (
          SELECT c_1.id,
             f.level_ref,
             string_agg(DISTINCT f.name, ', '::text) AS names
-           FROM specimens s
-             JOIN LATERAL fct_get_tax_hierarchy(s.taxon_ref, ARRAY[12, 28]) f(r_start_id, id, name, level_ref, parent_ref) ON f.r_start_id = s.taxon_ref
-             JOIN collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text) AND c_1.publish_to_gbif = true
+           FROM darwin2.specimens s
+           JOIN LATERAL darwin2.fct_get_tax_hierarchy(s.taxon_ref, ARRAY[12, 28]) f(r_start_id, id, name, level_ref, parent_ref) ON f.r_start_id = s.taxon_ref
+           JOIN darwin2.collections c_1 ON (((s.collection_path::text || '/'::text) || s.collection_ref) || '/'::text) ~~ (('%/'::text || c_1.id) || '/%'::text) AND c_1.publish_to_gbif = true
           GROUP BY c_1.id, f.level_ref
-        ), classes_orders_coverage2 AS (
+        ), 
+     classes_orders_coverage2 AS (
          SELECT classes.id,
-            classes.names AS class_taxonomic_coverage,
-            orders.names AS order_taxonomic_coverage
+           classes.names AS class_taxonomic_coverage,
+           orders.names AS order_taxonomic_coverage
            FROM classes_orders_coverage classes
-             LEFT JOIN classes_orders_coverage orders ON orders.id = classes.id
+           LEFT JOIN classes_orders_coverage orders ON orders.id = classes.id
           WHERE classes.level_ref = 12 AND orders.level_ref = 28
         )
- SELECT ((((((('The '::text || c.title_en) || ' contains '::text) || si.nb_spec) || ' digitised specimens over '::text) || sc.nb_species) || ' taxa (mostly species). The following classes are included: '::text) || coc.class_taxonomic_coverage) || '.'::text AS abstract,
-    'collection' AS scope,
+ SELECT ((((((('The '::text || c.title_en) || ' contains '::text) || si.nb_spec) || ' digitised specimens of '::text) || sc.nb_species) || ' taxa (at '||si.ranks||' level). The following classes are included: '::text) || coc.class_taxonomic_coverage) || '.'::text AS abstract,
+    'collection'::text AS scope,
     si.nb_spec,
     sc.nb_species,
     si.ig_num,
-    c.code as existing_code,
+    si.ranks,
+    c.code AS existing_code,
     c.id,
     c.name,
     c.name_indexed AS code,
@@ -99,6 +106,7 @@ CREATE MATERIALIZED VIEW mv_eml AS
     c.title_nl,
     c.title_fr,
     c.profile,
+    c.path,
     gc.geographic_coverage,
     gc.min_lon,
     gc.max_lon,
@@ -115,20 +123,20 @@ CREATE MATERIALIZED VIEW mv_eml AS
     coc.class_taxonomic_coverage,
     coc.order_taxonomic_coverage,
     'natural history collection, RBINS, DaRWIN, '::text || c.name::text AS keywords,
-    'Royal Belgian Institute for Natural Sciences' AS institute_name,
-    'Department of ' AS institute_dept_abbrev,
+    'Royal Belgian Institute for Natural Sciences'::text AS institute_name,
+    'Department of '::text AS institute_dept_abbrev,
     (curator.given_name::text || ' '::text) || curator.family_name::text AS boss,
     uc1.entry AS boss_email,
-    'curator' AS boss_role,
+    'curator'::text AS boss_role,
     (staff.given_name::text || ' '::text) || staff.family_name::text AS subboss,
     uc2.entry AS subboss_email,
-    'Collection manager' AS subboss_role
-   FROM collections c
+    'Collection manager'::text AS subboss_role
+   FROM darwin2.collections c
      LEFT JOIN specimen_info si ON c.id = si.id
-     LEFT JOIN users curator ON c.main_manager_ref = curator.id
-     LEFT JOIN users_comm uc1 ON uc1.person_user_ref = curator.id AND uc1.comm_type::text = 'e-mail'::text
-     LEFT JOIN users staff ON c.staff_ref = staff.id
-     LEFT JOIN users_comm uc2 ON uc2.person_user_ref = staff.id AND uc2.comm_type::text = 'e-mail'::text
+     LEFT JOIN darwin2.users curator ON c.main_manager_ref = curator.id
+     LEFT JOIN darwin2.users_comm uc1 ON uc1.person_user_ref = curator.id AND uc1.comm_type::text = 'e-mail'::text
+     LEFT JOIN darwin2.users staff ON c.staff_ref = staff.id
+     LEFT JOIN darwin2.users_comm uc2 ON uc2.person_user_ref = staff.id AND uc2.comm_type::text = 'e-mail'::text
      LEFT JOIN children_geographic_coverage gc ON gc.id = c.id
      LEFT JOIN children_temporal_coverage tc ON tc.id = c.id
      LEFT JOIN classes_orders_coverage2 coc ON coc.id = c.id

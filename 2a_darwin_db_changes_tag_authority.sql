@@ -5,6 +5,7 @@ CREATE TABLE darwin2.tag_group_distinct (
                 sub_group_name_indexed VARCHAR NOT NULL,
                 group_name_indexed VARCHAR NOT NULL,
                 tag_value VARCHAR NOT NULL,
+                --path VARCHAR NOT NULL, --TODO
                 CONSTRAINT id PRIMARY KEY (id),
                 CONSTRAINT subgroup_group_value_unique UNIQUE (tag_value, group_name_indexed, sub_group_name_indexed)
 );
@@ -912,7 +913,7 @@ INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'adm
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'area', 'zone', 'ZN', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'zone', 'ZN', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'zoo', 'ZOO', 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'undefined', NULL, 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'undefined', 'AREA', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'hillstation', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'stretch', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'wijnboerderij', NULL, 20);
@@ -971,7 +972,7 @@ INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hyd
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'topographic', 'massive', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'altwasseropstuwingbackwater', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', '', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'historical', 'undefined', NULL, 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'historical', 'undefined', 'AREA', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'historical', 'spanishempire', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'historical', 'occupiedterritory', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'historical', 'mandatmandaat', NULL, 20);
@@ -1020,8 +1021,8 @@ INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'adm
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'vegetation', 'plant', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'administrativearea', 'biogeographicrealmecozone', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'administrativearea', 'bassinlocalappelation', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'unescoworldheritagesite', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'guesthouse', NULL, 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'unescoworldheritagesite', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'guesthouse', 'AREA', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'greenhouseserre', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'enterprise', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'domein', NULL, 20);
@@ -1042,35 +1043,36 @@ INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'pop
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'populated', '', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'vishandel', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'view', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'undefined', NULL, 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'undefined', 'AREA', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'trawl', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'seamarknavigationmark', NULL, 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'roadhouse', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'refstockmans', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'poste', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'paroisse', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'formation', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'exactsite', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'domaine', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', '', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'orography', '', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'wolfsgrubewolfskuiltrappingpit', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'wheelrutsspoorvormingornierage', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'refuge', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'watervoorzieningarriveedeauwatersupply', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'watertube', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'waterplas', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'roadhouse', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'waterketelboilerchaudiere', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'wateringwatermeadow', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'vlei', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'vlasrootput', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'vadose', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'undefined', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'transbordeurpontferry', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'terrasse', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'administrativearea', '', NULL, 20);
-INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'jeugdverblijf', NULL, 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'refstockmans', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'poste', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'paroisse', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'formation', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'exactsite', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', 'domaine', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'other', '', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'orography', '', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'wolfsgrubewolfskuiltrappingpit', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'wheelrutsspoorvormingornierage', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'refuge', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'watervoorzieningarriveedeauwatersupply', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'watertube', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'waterplas', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'roadhouse', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'waterketelboilerchaudiere', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'wateringwatermeadow', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'vlei', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'vlasrootput', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'vadose', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'undefined', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'transbordeurpontferry', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'hydrographic', 'terrasse', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'administrativearea', '', 'AREA', 20);
+INSERT INTO darwin2.tag_groups_authority_categories VALUES ('geonames.org', 'spot', 'jeugdverblijf', 'AREA', 20);
+
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('marineregions.org', 'topographic', 'archipel', 'Archipelago', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('marineregions.org', 'topographic', 'archipelago', 'Archipelago', 20);
 INSERT INTO darwin2.tag_groups_authority_categories VALUES ('marineregions.org', 'hydrographic', 'archipelago', 'Archipelago', 20);
@@ -1260,73 +1262,3 @@ COMMENT ON COLUMN darwin2.tag_authority_tag_authority.tag_authority_ref1 IS 'Ref
 COMMENT ON COLUMN darwin2.tag_authority_tag_authority.tag_authority_ref2 IS 'Reference to the right-hand (object) authoritative vocabulary entry.';
 COMMENT ON COLUMN darwin2.tag_authority_tag_authority.tag_authority_predicate IS 'Predicate that indicates a relation between a subject and an object.';
 
-
---
--- PostgreSQL database dump complete
-
-DROP MATERIALIZED VIEW IF EXISTS darwin2.mv_tag_to_country;
-
-CREATE MATERIALIZED VIEW darwin2.mv_tag_to_country AS 
- SELECT DISTINCT gtu.id AS gtu_ref,
-    t1.tag_group_distinct_ref,
-    t1.tag_value,
-    tacountry.code,
-    tacountry.url,
-    tacountry.pref_label,
-    tacountry.alternative_representations -> 'ISO 3166-2'::text AS country_iso
-   FROM darwin2.gtu
-     LEFT JOIN  darwin2.tag_groups t1 ON gtu.id = t1.gtu_ref
-     RIGHT JOIN darwin2.tag_groups tcountry ON gtu.id = tcountry.gtu_ref
-     --RIGHT JOIN darwin2.tag_group_distinct tdcountry ON tcountry.tag_value::text = td.tag_value::text AND td.sub_group_name_indexed::text = tcountry.sub_group_name_indexed::text AND td.group_name_indexed::text = tcountry.group_name_indexed::text AND td.sub_group_name_indexed::text = 'country'::text
-     --LEFT JOIN darwin2.tag_tag_authority ttacountry ON ttacountry.tag_group_distinct_ref = tdcountry.id
-     LEFT JOIN darwin2.tag_tag_authority ttacountry ON ttacountry.tag_group_distinct_ref = tcountry.tag_group_distinct_ref
-     LEFT JOIN darwin2.tag_authority tacountry ON ttacountry.tag_authority_ref = tacountry.id
-  WHERE tcountry.sub_group_name_indexed::text = 'country'::text AND tacountry.id IS NOT NULL and t1.sub_group_name_indexed::text <> 'country'::text AND t1.id IS NOT NULL
-WITH DATA;
-
-ALTER TABLE darwin2.mv_tag_to_country
-  OWNER TO postgres;
-GRANT ALL ON TABLE darwin2.mv_tag_to_country TO postgres;
-GRANT ALL ON TABLE darwin2.mv_tag_to_country TO darwin2;
-
-
-set search_path to darwin2,public;
-
-DROP MATERIALIZED VIEW IF EXISTS darwin2.mv_darwin_ipt_rbins;
-DROP VIEW IF EXISTS darwin2.v_darwin_ipt_rbins;
-DROP MATERIALIZED VIEW IF EXISTS darwin2.mv_tag_to_locations;
-CREATE MATERIALIZED VIEW darwin2.mv_tag_to_locations AS 
- SELECT DISTINCT 
-	t.id AS original_identifier,
-	t.tag_value AS original_location,
-	t.group_name_indexed AS original_type,
-	t.sub_group_name_indexed AS original_sub_type,
-    case tcat.authority when 'geonames.org' then tcat.gazetteer_type_mapped end AS geonames_type_mapped,
-    case tcat.authority when 'marineregions.org' then tcat.gazetteer_type_mapped end AS marineregions_type_mapped,
-    tcat.priority,
-    ta.code AS gazetteer_code,
-    ta.url AS gazetteer_url,
-    ta.pref_label AS gazetteer_pref_label,
-    cast (props_lat.lower_value as NUMERIC) as latitude,
-    cast (props_lon.lower_value as NUMERIC) as longitude,
-    countries.country_iso,
-    countries.pref_label as country_pref_label
-   FROM darwin2.gtu
-     RIGHT JOIN darwin2.tag_groups t ON gtu.id = t.gtu_ref
-     --RIGHT JOIN darwin2.tag_group_distinct td ON t.tag_value::text = td.tag_value::text AND td.sub_group_name_indexed::text = t.sub_group_name_indexed::text AND td.group_name_indexed::text = t.group_name_indexed::text AND td.sub_group_name_indexed::text <> 'country'::text
-     LEFT JOIN darwin2.tag_tag_authority tta ON tta.tag_group_distinct_ref = t.tag_group_distinct_ref and t.sub_group_name_indexed::text <> 'country'::text
-     LEFT JOIN darwin2.tag_authority ta ON tta.tag_authority_ref = ta.id
-     LEFT JOIN darwin2.tag_groups_authority_categories tcat on tcat.original_type = t.group_name_indexed and tcat.original_sub_type = t.sub_group_name_indexed --get the priority of the original terms
-     --LEFT JOIN darwin2.tag_groups_authority_categories tcat_gzterms on tcat.gazetteer_type_mapped = ta.type[1]  --get the priority of the mapped terms
-     LEFT JOIN darwin2.properties props_lat on props_lat.record_id = ta.id and props_lat.referenced_relation='tag_authority' and props_lat.property_type='latitude_wgs_84'
-     LEFT JOIN darwin2.properties props_lon on props_lon.record_id = ta.id and props_lon.referenced_relation='tag_authority' and props_lon.property_type='longitude_wgs_84'
-     LEFT JOIN (select distinct tag_group_distinct_ref,country_iso,pref_label from darwin2.mv_tag_to_country) countries ON countries.tag_group_distinct_ref = t.tag_group_distinct_ref
-    ORDER BY t.tag_value
-WITH DATA;
-
-ALTER TABLE darwin2.mv_tag_to_locations
-  OWNER TO postgres;
-GRANT ALL ON TABLE darwin2.mv_tag_to_locations TO postgres;
-GRANT ALL ON TABLE darwin2.mv_tag_to_locations TO darwin2;
-
---select * from darwin2.mv_tag_to_locations where priority is null --gazetteer_pref_label = 'Jamaica'
