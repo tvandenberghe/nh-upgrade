@@ -1,4 +1,21 @@
 set search_path to darwin2,public;
+
+CREATE OR REPLACE FUNCTION darwin2.fct_mask_date(
+    date_fld timestamp without time zone,
+    mask_fld integer)
+  RETURNS text AS
+$BODY$
+
+  SELECT
+CASE WHEN ($2 & 32)!=0 THEN date_part('year',$1)::text ELSE 'xxxx' END || '-' ||
+CASE WHEN ($2 & 16)!=0 THEN lpad(date_part('month',$1)::text, 2, '0') ELSE 'xx' END || '-' ||
+CASE WHEN ($2 & 8)!=0 THEN lpad(date_part('day',$1)::text, 2, '0') ELSE 'xx' END;
+$BODY$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION darwin2.fct_mask_date(timestamp without time zone, integer)
+  OWNER TO darwin2;
+  
 --ALTER VIEW v_darwin_ipt_rbins RENAME TO v_darwin_ipt_rbins_old;
 
 DROP MATERIALIZED VIEW IF EXISTS mv_darwin_ipt_rbins CASCADE;
@@ -98,7 +115,7 @@ order by gtu.id) q
 
  SELECT distinct string_agg(DISTINCT specimens.id::character varying::text, ','::text) AS ids,
     'PhysicalObject' as type,
-    'http://collections.naturalsciences.be/specimen/'::text || specimens.id::character varying::text AS occurrence_id,
+    'http://collections.naturalsciences.be/specimen/'::text || specimens.id::text AS occurrence_id,
     min(specimens.specimen_creation_date) as ndwc_created,
     max(GREATEST(specimen_auditing.modification_date_time, gtu_auditing.modification_date_time)) as modified,
     case when collections.code in ('paleo','IST','PalBot') then 'FossilSpecimen'::text else 'PreservedSpecimen'::text end AS basis_of_record,
@@ -144,15 +161,14 @@ order by gtu.id) q
            FROM people
           WHERE people.id = ANY (specimens.spec_coll_ids)) AS recorded_by,
     max(identifications.notion_date) as date_identified,
-    
     COALESCE(specimens.specimen_count_max, specimens.specimen_count_min, 1) AS organism_quantity,
     'SpecimensInContainer'::text AS organism_quantity_type,
     specimens.sex,
     specimens.stage AS life_stage,
-    (('container type: '::text || specimens.container_type::text) || '; preservation method: '::text) || specimens.container_storage::text AS preparations,
+    coalesce('container type: '::text||specimens.container_type,'') || coalesce('; sample preparator: '::text||string_agg(mof_preparator.measurement_value,', '),'') || coalesce('; sample preparation: '::text||string_agg(mof_preparation.measurement_value,', '),'') || coalesce('; preservation method: '::text||specimens.container_storage,'') AS preparations,
     specimens.specimen_status::text AS disposition,
     'urn:catalog:RBINS:IG:'::text || specimens.ig_num::text AS other_catalog_numbers,
-    coalesce(b.title,'')||' '||coalesce(b.abstract,'') as associated_references,
+    coalesce(string_agg(DISTINCT b.title,', '),'')||coalesce(' '||string_agg(DISTINCT b.abstract,', '),'') as associated_references,
     CASE when specimens.station_visible THEN null else 'Precise location information withheld - country only' end as information_withheld,
     CASE when specimens.station_visible THEN locations.verbatim_location else NULL end as verbatim_location,
     CASE when specimens.station_visible THEN locations.location else NULL end as location,
@@ -176,27 +192,37 @@ order by gtu.id) q
     CASE when specimens.station_visible THEN locations.verbatim_SRS else NULL end as verbatim_SRS, 
     CASE when specimens.station_visible THEN locations.coordinate_uncertainty_in_meters else NULL end as coordinate_uncertainty_in_meters,
     CASE when specimens.station_visible THEN locations.footprint_wkt else NULL end as footprint_wkt,
+    elevation.measurement_value as minimum_elevation_in_meters,
+    elevation.measurement_value as maximum_elevation_in_meters,
+    case 
+        when sampling_depth.measurement_value is not null then sampling_depth.measurement_value 
+        when (sampling_depth_max.measurement_value IS NOT NULL AND sampling_depth_min.measurement_value is NULL) then sampling_depth_max.measurement_value
+        else sampling_depth_min.measurement_value
+    end as minimum_depth_in_meters, 
+    case 
+        when sampling_depth.measurement_value is not null then sampling_depth.measurement_value
+        when (sampling_depth_min.measurement_value IS NOT NULL AND sampling_depth_max.measurement_value is NULL) then sampling_depth_min.measurement_value
+        else sampling_depth_max.measurement_value
+    end as maximum_depth_in_meters,
     (SELECT string_agg(people.formated_name::text, ', '::text ORDER BY people.id) AS string_agg
       FROM people
       WHERE people.id = ANY (specimens.spec_ident_ids)) AS identified_by,
     CASE WHEN specimens.gtu_from_date_mask = 0 THEN 
-	CASE WHEN specimens.gtu_to_date_mask <> 0 then replace(specimens.gtu_to_date::text,'-xx','') 
-	ELSE null
-	END
+		CASE WHEN specimens.gtu_to_date_mask <> 0 then replace(specimens.gtu_to_date::text,'-xx','') 
+		ELSE null
+		END
     ELSE replace(fct_mask_date(specimens.gtu_from_date, specimens.gtu_from_date_mask),'-xx','') end
     ||
-    CASE WHEN specimens.gtu_from_date = specimens.gtu_to_date or specimens.gtu_to_date_mask = 0 THEN ''
-    ELSE '/'||replace(fct_mask_date(specimens.gtu_to_date, specimens.gtu_to_date_mask),'-xx','')
+		CASE WHEN specimens.gtu_from_date = specimens.gtu_to_date or specimens.gtu_to_date_mask = 0 THEN ''
+		ELSE '/'||replace(fct_mask_date(specimens.gtu_to_date, specimens.gtu_to_date_mask),'-xx','')
     END  AS event_date,
     specimens.gtu_code as field_number,
-    null as habitat, 
-    null as minimum_depth_in_meters, 
-    null as maximum_depth_in_meters
+    null as habitat
    FROM specimens
      LEFT JOIN users_tracking specimen_auditing on specimen_auditing.record_id = specimens.id and specimen_auditing.referenced_relation='specimens'
      LEFT JOIN collections ON specimens.collection_ref = collections.id
      LEFT JOIN codes ON codes.referenced_relation::text = 'specimens'::text AND codes.code_category::text = 'main'::text AND specimens.id = codes.record_id
-     LEFT JOIN identifications ON identifications.referenced_relation::text = 'specimens'::text AND specimens.id = identifications.record_id AND identifications.notion_concerned::text = 'taxonomy'::text
+     LEFT JOIN identifications ON identifications.referenced_relation::text = 'specimens'::text AND specimens.id = identifications.record_id AND identifications.notion_concerned::text = 'taxonomy'::text and extract(year from identifications.notion_date) > 1800
      LEFT JOIN gtu ON specimens.gtu_ref = gtu.id
      LEFT JOIN users_tracking gtu_auditing on gtu_auditing.record_id = gtu.id and gtu_auditing.referenced_relation='gtu'
      left join location_cte locations on locations.gtu_ref=gtu.id
@@ -204,8 +230,22 @@ order by gtu.id) q
      left join catalogue_bibliography cb on cb.record_id = specimens.id and cb.referenced_relation='specimens'
      left join bibliography b on b.id = cb.bibliography_ref
      left join comments taxon_remarks on taxon_remarks.record_id=taxa.taxonomy_ref and taxon_remarks.referenced_relation='taxonomy' and taxon_remarks.notion_concerned='taxon information'
-     GROUP BY occurrence_id, collections.code, collections.name, collections.id, collections.path, /*codes.code_prefix, codes.code_prefix_separator, codes.code, codes.code_suffix_separator, codes.code_suffix,*/ scientific_name, scientific_name_id, taxon_id, taxa.kingdom, taxa.phylum, taxa.class, taxa.ordo, taxa.family, taxa.genus, taxa.subgenus, taxa.specific_epithet, taxa.infra_specific_epithet, taxa.scientific_name_authorship, taxa.taxonomy_ref, taxa.parent_name_usage, taxa.taxonomic_status, taxon_rank, specimens.spec_coll_ids, specimens.taxon_name, specimens.spec_ident_ids, specimens.station_visible, specimens.type, specimens.taxon_path, specimens.taxon_ref, specimens.specimen_count_max, specimens.specimen_count_min, specimens.sex, specimens.stage, specimens.container_type, specimens.container_storage, specimens.ig_num, ndwc_verbatim_country, locations.verbatim_location, locations.country_code, locations.location, locations.ndwc_nice_verbatim_location, locations.location_id, locations.ndwc_geotypes, locations.country, locations.water_body, locations.island_group, locations.island, locations.decimal_latitude, locations.decimal_longitude, locations.ndwc_tag_decimal_latitude, locations.ndwc_tag_decimal_longitude, locations.ndwc_gtu_decimal_latitude, locations.ndwc_gtu_decimal_longitude, locations.geodetic_datum, locations.verbatim_SRS, locations.coordinate_uncertainty_in_meters, locations.footprint_wkt, specimens.gtu_from_date_mask, specimens.gtu_from_date, specimens.gtu_to_date_mask, specimens.gtu_to_date, specimens.gtu_ref, specimens.gtu_code, specimens.specimen_status, b.title, b.abstract, taxon_remarks.comment
-     order by occurrence_id;
+     left join darwin2.mv_darwin_ipt_rbins_mof elevation on elevation.occurrence_id='http://collections.naturalsciences.be/specimen/'::text || specimens.id::text and elevation.measurement_type='elevation'
+     left join darwin2.mv_darwin_ipt_rbins_mof sampling_depth on sampling_depth.occurrence_id='http://collections.naturalsciences.be/specimen/'::text || specimens.id::text and sampling_depth.measurement_type='sampling_depth'
+     left join darwin2.mv_darwin_ipt_rbins_mof sampling_depth_min on sampling_depth_min.occurrence_id='http://collections.naturalsciences.be/specimen/'::text || specimens.id::text and sampling_depth_min.measurement_type='sampling_depth_min'
+     left join darwin2.mv_darwin_ipt_rbins_mof sampling_depth_max on sampling_depth_max.occurrence_id='http://collections.naturalsciences.be/specimen/'::text || specimens.id::text and sampling_depth_max.measurement_type='sampling_depth_max'
+     left join darwin2.mv_darwin_ipt_rbins_mof mof_preparation on mof_preparation.occurrence_id='http://collections.naturalsciences.be/specimen/'::text || specimens.id::text and mof_preparation.measurement_type='preparation'
+     left join darwin2.mv_darwin_ipt_rbins_mof mof_preparator on mof_preparator.occurrence_id='http://collections.naturalsciences.be/specimen/'::text || specimens.id::text and mof_preparator.measurement_type='preparator'
+
+     where collections.path not like '/231%' and specimens.taxon_name is not null
+     GROUP BY specimens.id, collections.code, collections.name, collections.id, collections.path, scientific_name, scientific_name_id, taxon_id, taxa.kingdom, taxa.phylum, taxa.class, taxa.ordo, taxa.family, taxa.genus, taxa.subgenus, 
+     taxa.specific_epithet, taxa.infra_specific_epithet, taxa.scientific_name_authorship, taxa.taxonomy_ref, taxa.parent_name_usage, taxa.taxonomic_status, taxon_rank, specimens.spec_coll_ids, specimens.taxon_name, specimens.spec_ident_ids, 
+     specimens.station_visible, specimens.type, specimens.taxon_path, specimens.taxon_ref, specimens.specimen_count_max, specimens.specimen_count_min, specimens.sex, specimens.stage, specimens.container_type, specimens.container_storage, 
+     specimens.ig_num, ndwc_verbatim_country, locations.verbatim_location, locations.country_code, locations.location, locations.ndwc_nice_verbatim_location, locations.location_id, locations.ndwc_geotypes, locations.country, locations.water_body, 
+     locations.island_group, locations.island, locations.decimal_latitude, locations.decimal_longitude, locations.ndwc_tag_decimal_latitude, locations.ndwc_tag_decimal_longitude, locations.ndwc_gtu_decimal_latitude, locations.ndwc_gtu_decimal_longitude, 
+     locations.geodetic_datum, locations.verbatim_SRS, locations.coordinate_uncertainty_in_meters, locations.footprint_wkt, specimens.gtu_from_date_mask, specimens.gtu_from_date, specimens.gtu_to_date_mask, specimens.gtu_to_date, specimens.gtu_ref, 
+     specimens.gtu_code, specimens.specimen_status, taxon_remarks.comment, /*mof_preparation.measurement_value, mof_preparator.measurement_value,*/ elevation.measurement_value, sampling_depth.measurement_value, sampling_depth_min.measurement_value, sampling_depth_max.measurement_value
+     order by occurrence_id;--,LENGTH(b.title), LENGTH(b.abstract);
      
 ALTER TABLE v_darwin_ipt_rbins OWNER TO darwin2;
 GRANT ALL ON TABLE v_darwin_ipt_rbins TO darwin2;

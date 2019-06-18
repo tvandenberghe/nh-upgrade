@@ -7,11 +7,11 @@ CREATE OR REPLACE FUNCTION fct_get_tax_hierarchy(
 $BODY$
 WITH RECURSIVE select_levels AS (
         SELECT  t.id,t.name,t.level_ref,t.parent_ref
-        FROM    taxonomy t
+        FROM    darwin2.taxonomy t
         where t.id=start_id
         UNION ALL
         SELECT   tn.id, tn.name,tn.level_ref,tn.parent_ref
-        FROM    taxonomy tn
+        FROM    darwin2.taxonomy tn
         JOIN    select_levels
         ON      tn.id = select_levels.parent_ref
         )
