@@ -1,4 +1,5 @@
 #!/bin/bash   
+#./secrets.sh
 #psql -h ostrea.rbins.be -d darwin2_rbins_test -U postgres < /home/thomas/Documents/Project-NaturalHeritage/datadumps/darwin_dev_rbins_20190503.dump
 server=ostrea.rbins.be
 #localhost
@@ -11,7 +12,7 @@ scp taxamatch2.csv "$serveruser@$server:/tmp"
 
 #psql -h "$server" -d "$db" -U postgres -c "DROP TABLE IF EXISTS import.taxamatch;"
 
-#pgfutter --table "taxamatch" --schema "import" --db "$db"  --host "$server" --port 5432 --user postgres --pw "postgres" csv taxamatch.csv -d ','
+#pgfutter --table "taxamatch" --schema "import" --db "$db"  --host "$server" --port 5432 --user postgres csv taxamatch.csv -d ','
 #psql -h "$server" -d "$db" -U postgres -c "COPY import.taxamatch (taxon, worms_id, worms_scientific_name, worms_is_terrestrial, worms_is_freshwater, worms_is_brackish, worms_is_marine, worms_lsid, worms_url) FROM '/tmp/taxamatch2.csv' DELIMITER E'\t' CSV HEADER;"
 
 #psql -h "$server" -d "$db" -U postgres -c "
