@@ -9,8 +9,6 @@ db=darwin2_rbins_test
 echo "Working on $server"
 scp taxamatch2.csv "$serveruser@$server:/tmp"
 
-export PGPASSWORD='postgres'; 
-
 #psql -h "$server" -d "$db" -U postgres -c "DROP TABLE IF EXISTS import.taxamatch;"
 
 #pgfutter --table "taxamatch" --schema "import" --db "$db"  --host "$server" --port 5432 --user postgres --pw "postgres" csv taxamatch.csv -d ','
