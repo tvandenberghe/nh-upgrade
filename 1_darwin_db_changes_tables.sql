@@ -1,11 +1,15 @@
 ﻿set search_path to darwin2;
 
-UPDATE collections set name='Merostomata' where name='Merostomata ';
-UPDATE collections set name='Brachiopoda/Types' where name='Brachiopoda /Types';
 
 
 alter table collections add publish_to_gbif boolean;
 alter table collections add profile text[4];
+alter table collections add column title_en text, add column title_nl text, add column title_fr text;
+
+--set ile de callot to negative longitude
+
+UPDATE collections set name='Merostomata' where name='Merostomata ';
+UPDATE collections set name='Brachiopoda/Types' where name='Brachiopoda /Types';
 
 UPDATE collections set publish_to_gbif = false;
 
@@ -107,7 +111,6 @@ id=181  and name='Reptilia Not visible' or
 id=225  and name='Rhinocerotidae' or
 id=308  and name='Vertebrates_Import_test';
 
-alter table collections add column title_en text, add column title_nl text, add column title_fr text;
 update collections set title_en=null, title_nl=null, title_fr=null;
 
 update collections set title_en='Royal Belgian Institute of Natural Sciences Bird Collection', title_nl='Vogelcollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Oiseaux de l''Institut royal des Sciences naturelles de Belgique' where id=6;

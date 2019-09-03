@@ -19,13 +19,13 @@ SELECT t1.gtu_ref,
     tacountry.url as country_url_gn,
     tacountry.pref_label as country_pref_label_gn,
     tacountry.alternative_representations -> 'ISO 3166-2'::text AS country_iso,
-    array_agg(DISTINCT coord.lower_value) as country_coord
+    hstore(array_agg(COALESCE(coord.property_type::text,'no coords'::text)), array_agg(COALESCE(coord.lower_value::text,'no coords'::text))) as country_coord
     FROM darwin2.tag_groups t1
     RIGHT JOIN darwin2.tag_groups tcountry ON t1.gtu_ref = tcountry.gtu_ref
     LEFT JOIN darwin2.tag_tag_authority ttacountry ON ttacountry.tag_group_distinct_ref = tcountry.tag_group_distinct_ref
     LEFT JOIN darwin2.tag_authority tacountry ON ttacountry.tag_authority_ref = tacountry.id
-    LEFT JOIN (select record_id,lower_value from darwin2.properties where referenced_relation='tag_authority' and property_type in ('latitude_wgs_84','longitude_wgs_84') order by record_id, property_type asc) coord on coord.record_id = tacountry.id
-    WHERE t1.tag_value not in ('Oceans','/','?') AND tcountry.sub_group_name_indexed::text = 'country'::text AND tacountry.id IS NOT NULL and t1.sub_group_name_indexed::text not in ('ocean','continent') AND t1.id IS NOT NULL
+    LEFT JOIN (select record_id,lower_value,property_type from darwin2.properties where referenced_relation='tag_authority' and property_type in ('latitude_wgs_84','longitude_wgs_84') order by property_type ) coord on coord.record_id = tacountry.id
+    WHERE t1.tag_value not in ('Oceans','/','?') AND tcountry.sub_group_name_indexed::text = 'country'::text AND tacountry.id IS NOT NULL and t1.sub_group_name_indexed::text not in ('ocean','country','continent') AND t1.id IS NOT NULL
 group by 
     t1.gtu_ref,
     t1.tag_group_distinct_ref,
@@ -59,8 +59,8 @@ SELECT DISTINCT
     case when tcat_gn.gazetteer_type_mapped = 'PCLI' then countries.country_code_gn else ta.code end AS gazetteer_code,
     case when tcat_gn.gazetteer_type_mapped = 'PCLI' then countries.country_url_gn else ta.url end AS gazetteer_url,
     ta.pref_label AS gazetteer_pref_label,
-    cast (case when tcat_gn.gazetteer_type_mapped = 'PCLI' then countries.country_coord[1] else props_lat.lower_value end as NUMERIC) as latitude,
-    cast (case when tcat_gn.gazetteer_type_mapped = 'PCLI' then countries.country_coord[2] else props_lon.lower_value end as NUMERIC) as longitude,
+    cast (case when tcat_gn.gazetteer_type_mapped = 'PCLI' then countries.country_coord->'latitude_wgs_84' else props_lat.lower_value end as NUMERIC) as latitude,
+    cast (case when tcat_gn.gazetteer_type_mapped = 'PCLI' then countries.country_coord->'longitude_wgs_84' else props_lon.lower_value end as NUMERIC) as longitude,
     countries.country_iso,
     countries.country_pref_label_gn as country_pref_label
    FROM darwin2.gtu

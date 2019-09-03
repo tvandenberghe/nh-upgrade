@@ -444,7 +444,7 @@ SELECT distinct gtu.id as gtu_ref,
 		string_agg(coordinate_precision.value,', ') as coordinate_precision, 
 		string_agg(lambert_coordinates_x_y.applies_to||': '||lambert_coordinates_x_y.value,', ' order by lambert_coordinates_x_y.applies_to) as lambert_coordinates_x_y 
 FROM	gtu 
-		left join coordinates_cte AS datum ON gtu.id = datum.record_id AND datum.property = 'datum' 	
+		left join coordinates_cte AS datum ON gtu.id = datum.record_id AND datum.property = 'datum'
 		left join coordinates_cte AS ellipsoid ON gtu.id = ellipsoid.record_id AND ellipsoid.property = 'ellipsoid' 
 		left join coordinates_cte AS verbatim_coordinates ON gtu.id = verbatim_coordinates.record_id AND verbatim_coordinates.property = 'verbatimCoordinates'
 		left join coordinates_cte AS coordinate_precision ON gtu.id = coordinate_precision.record_id AND coordinate_precision.property = 'coordinatePrecision' 
@@ -453,7 +453,8 @@ where gtu.latitude is not null or verbatim_coordinates is not null
 group by id,trunc(gtu.latitude::numeric,10), trunc(gtu.longitude::numeric,10), datum.value,ellipsoid.value
 
 ) q
-order by gtu_ref,source, decimal_start_latitude,decimal_start_longitude, decimal_end_latitude asc,decimal_end_longitude asc --this ensures that preference is taken for gtus that have an end coordinate, and that locational info from gtu is not considered if there is locational information found in the properties
+
+order by gtu_ref,source asc, decimal_start_latitude,decimal_start_longitude, decimal_end_latitude asc,decimal_end_longitude asc --this ensures that preference is taken for gtus that have an end coordinate, and that locational info from gtu is not considered if there is locational information found in the properties
 
 /*
 Rationale for not including the gtu location information if ot is different from the locations calculated from the infortmation in properties:
@@ -464,6 +465,14 @@ select gtu.id,gtu.code,p.lower_value, gtu.location, mv_spatial.source,mv_spatial
 mv_spatial left join gtu on id=gtu_ref 
 left join properties p on p.record_id=gtu.id
 where mv_spatial.decimal_start_latitude <> gtu.latitude
+order by gtu.id
+
+set search_path to darwin2,public;
+
+select gtu.id,gtu.code,p.lower_value, gtu.location, mv_spatial.source,round(mv_spatial.decimal_start_latitude::numeric,7), round(gtu.latitude::numeric,7) as gtu_latitude, round(mv_spatial.decimal_start_longitude::numeric,7), round(gtu.longitude::numeric,7) as gtu_longitude from 
+mv_spatial left join gtu on id=gtu_ref 
+left join properties p on p.record_id=gtu.id
+where round(mv_spatial.decimal_start_latitude::numeric,1) <> round(gtu.latitude::numeric,1)
 order by gtu.id
 
 The query returns many wrong coordinates being stored in gtu
