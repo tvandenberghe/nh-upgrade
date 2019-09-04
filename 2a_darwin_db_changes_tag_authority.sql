@@ -170,12 +170,11 @@ ALTER FUNCTION fct_cpy_tags_to_distinct()
 
 DROP TRIGGER IF EXISTS trg_cpy_tags_to_distinct ON tag_groups;
   
-CREATE TRIGGER trg_cpy_tags_to_distinct
+/*CREATE TRIGGER trg_cpy_tags_to_distinct
 AFTER INSERT OR UPDATE ON tag_groups --delete keeps the values in tag_group_distinct
 FOR EACH ROW 
 WHEN (NEW.sub_group_name_indexed is not null or NEW.group_name_indexed is not null or NEW.tag_value is not null) 
-EXECUTE PROCEDURE fct_cpy_tags_to_distinct();
-
+EXECUTE PROCEDURE fct_cpy_tags_to_distinct();*/ --the trigger causes a deadlock apparently
 
 
 ALTER TABLE darwin2.tag_groups DISABLE TRIGGER fct_cpy_trg_del_dict_tag_groups;
