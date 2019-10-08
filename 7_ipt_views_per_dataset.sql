@@ -13,6 +13,17 @@ CREATE OR REPLACE view darwin2.darwin_reptilia as select occ.* from darwin2.mv_d
 CREATE OR REPLACE view darwin2.darwin_rotifera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='rotifera';
 CREATE OR REPLACE view darwin2.darwin_vertebratestypes as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='vertebratestypes';
 
+CREATE OR REPLACE view darwin2.darwin_acari as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='acari';
+CREATE OR REPLACE view darwin2.darwin_amphibia as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='amphibia';
+CREATE OR REPLACE view darwin2.darwin_araneae as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='araneae';
+CREATE OR REPLACE view darwin2.darwin_coleoptera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='coleoptera';
+CREATE OR REPLACE view darwin2.darwin_diptera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='diptera';
+CREATE OR REPLACE view darwin2.darwin_heterocera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='heterocera';
+CREATE OR REPLACE view darwin2.darwin_hymenoptera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='hymenoptera';
+CREATE OR REPLACE view darwin2.darwin_orthoptera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='orthoptera';
+CREATE OR REPLACE view darwin2.darwin_rhopalocera as select occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='rhopalocera';
+
+CREATE OR REPLACE view darwin2.darwin_complete as select * from darwin2.mv_darwin_ipt_rbins;
 /*------------------------*/
 
 CREATE OR REPLACE view darwin2.darwin_aves_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_aves occ on occ.occurrence_id=mof.occurrence_id;
@@ -29,3 +40,15 @@ CREATE OR REPLACE view darwin2.darwin_pisces_mof as select mof.* from darwin2.mv
 CREATE OR REPLACE view darwin2.darwin_reptilia_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_reptilia occ on occ.occurrence_id=mof.occurrence_id;
 CREATE OR REPLACE view darwin2.darwin_rotifera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_rotifera occ on occ.occurrence_id=mof.occurrence_id;
 CREATE OR REPLACE view darwin2.darwin_vertebratestypes_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_vertebratestypes occ on occ.occurrence_id=mof.occurrence_id;
+
+CREATE OR REPLACE view darwin2.darwin_acari_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_acari occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_amphibia_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_amphibia occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_araneae_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_araneae occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_coleoptera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_coleoptera occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_diptera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_diptera occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_heterocera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_heterocera occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_hymenoptera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_hymenoptera occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_orthoptera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_orthoptera occ on occ.occurrence_id=mof.occurrence_id;
+CREATE OR REPLACE view darwin2.darwin_rhopalocera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.darwin_rhopalocera occ on occ.occurrence_id=mof.occurrence_id;
+
+CREATE OR REPLACE view darwin2.darwin_complete_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof

@@ -12,6 +12,8 @@ scp taxamatch2.csv "$serveruser@$server:/tmp"
 
 psql -h "$server" -d "$db" -U postgres -c "DROP TABLE IF EXISTS import.taxamatch;"
 
+psql -h "$server" -d "$db" -U postgres -c "CREATE SCHEMA import;"
+
 pgfutter --table "taxamatch" --schema "import" --db "$db"  --host "$server" --port 5432 --user postgres csv taxamatch.csv -d ','
 psql -h "$server" -d "$db" -U postgres -c "COPY import.taxamatch (taxon, worms_id, worms_scientific_name, worms_is_terrestrial, worms_is_freshwater, worms_is_brackish, worms_is_marine, worms_lsid, worms_url) FROM '/tmp/taxamatch2.csv' DELIMITER E'\t' CSV HEADER;"
 
