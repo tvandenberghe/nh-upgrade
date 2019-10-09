@@ -198,7 +198,7 @@ ALTER TABLE darwin2.tag_groups ENABLE TRIGGER trg_cpy_gtutags_taggroups;
 ALTER TABLE darwin2.tag_groups ENABLE TRIGGER trg_trk_log_table_tag_groups;
 ALTER TABLE darwin2.tag_groups ENABLE TRIGGER trg_update_tag_groups_darwin_flat;
 
-ALTER TABLE darwin2.tag_groups ALTER COLUMN tag_group_distinct_ref SET NOT NULL;
+--ALTER TABLE darwin2.tag_groups ALTER COLUMN tag_group_distinct_ref SET NOT NULL; --remove the constraint because this disallows the creation of new tags! Actually designed in conjunction with the trigger above
 
 insert into authority_domain (name,website_url,webservice_root,webservice_format) values ('geonames.org','http://www.geonames.org/','http://api.geonames.org/search','json, xml');
 insert into authority_domain (name,website_url,webservice_root,webservice_format) values ('marineregions.org','http://marineregions.org/','http://marineregions.org/resth','json');
