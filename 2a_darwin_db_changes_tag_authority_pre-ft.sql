@@ -1262,137 +1262,104 @@ COMMENT ON COLUMN darwin2.tag_authority_tag_authority.tag_authority_ref2 IS 'Ref
 COMMENT ON COLUMN darwin2.tag_authority_tag_authority.tag_authority_predicate IS 'Predicate that indicates a relation between a subject and an object.';
 
 set search_path to darwin2,public;
-/*WRONG COORD SIGN*/
-update darwin2.properties set lower_value=54.2 where lower_value NOT LIKE '%''%' and record_id=130623 and property_type='longitude';		
-		
-update darwin2.properties set lower_value=-76.066667 where lower_value NOT LIKE '%''%' and record_id=137101 and property_type='longitude';	
-	
-update darwin2.properties set lower_value=-74.3 where lower_value NOT LIKE '%''%' and record_id=137109 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-68.533333 where lower_value NOT LIKE '%''%' and record_id=137112 and property_type='longitude';	
-	
-update darwin2.properties set lower_value=-58.233333 where lower_value NOT LIKE '%''%' and record_id=137116 and property_type='longitude';	
-	
-update darwin2.properties set lower_value=-17.06 where lower_value NOT LIKE '%''%' and record_id=137632 and property_type='longitude';	
-	
-update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';	
-		
-update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
-		
-update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';
-		
-update darwin2.properties set lower_value=5.433333 where lower_value NOT LIKE '%''%' and record_id=159099 and property_type='longitude';
-		
-update darwin2.properties set lower_value=4.766667 where lower_value NOT LIKE '%''%' and record_id=159557 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';
-
-update darwin2.properties set lower_value=-3.16667 where lower_value NOT LIKE '%''%' and record_id=198136 and property_type='latitude';	
-		
-update darwin2.properties set lower_value=-3.16667 where lower_value NOT LIKE '%''%' and record_id=198136 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.618334 where lower_value NOT LIKE '%''%' and record_id=203650 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.497777 where lower_value NOT LIKE '%''%' and record_id=203947 and property_type='longitude';		
-
-update darwin2.properties set lower_value=-4.485 where lower_value NOT LIKE '%''%' and record_id=203997 and property_type='longitude';	
-	
-update darwin2.properties set lower_value=-4.556389 where lower_value NOT LIKE '%''%' and record_id=204002 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.546666 where lower_value NOT LIKE '%''%' and record_id=205001 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.386944 where lower_value NOT LIKE '%''%' and record_id=205004 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.589166 where lower_value NOT LIKE '%''%' and record_id=205168 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.567778 where lower_value NOT LIKE '%''%' and record_id=205172 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-4.598889 where lower_value NOT LIKE '%''%' and record_id=205197 and property_type='longitude';
-		
-update darwin2.properties set lower_value=2.85 where lower_value NOT LIKE '%''%' and record_id=207714 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-27.9 where lower_value NOT LIKE '%''%' and record_id=208002 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-28.6 where lower_value NOT LIKE '%''%' and record_id=208020 and property_type='longitude';
-		
-update darwin2.properties set lower_value=-13.45 where lower_value NOT LIKE '%''%' and record_id=208324 and property_type='longitude';
-
-update darwin2.properties set lower_value=-70.5333333 where lower_value NOT LIKE '%''%' and record_id=208324 and property_type='latitude';	
-
---KEEP OLD DMS coordinates
-INSERT INTO darwin2.properties(
-	referenced_relation, record_id,  property_type, applies_to, applies_to_indexed, date_from_mask, date_from, date_to_mask, date_to, is_quantitative, property_unit, method, method_indexed, lower_value, lower_value_unified, upper_value, upper_value_unified, property_accuracy, property_type_ref)
-SELECT referenced_relation, record_id,  property_type||'_dms', applies_to, applies_to_indexed, date_from_mask, date_from, date_to_mask, date_to, is_quantitative, property_unit, method, method_indexed, lower_value, lower_value_unified, upper_value, upper_value_unified, property_accuracy, property_type_ref
-	FROM darwin2.properties
-	where referenced_relation='gtu'
-	and (property_type ilike '%latitude%' OR property_type ilike '%longitude%')
-	and lower_value ilike '%°%';
-
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';		
+	update darwin2.properties set lower_value=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';		
+	update darwin2.properties set lower_value=4.766667 where lower_value NOT LIKE '%''%' and record_id=159557 and property_type='longitude';		
+	update darwin2.properties set lower_value=5.433333 where lower_value NOT LIKE '%''%' and record_id=159099 and property_type='longitude';		
+	update darwin2.properties set lower_value=4.766667 where lower_value NOT LIKE '%''%' and record_id=159557 and property_type='longitude';		
+	update darwin2.properties set lower_value=2.85 where lower_value NOT LIKE '%''%' and record_id=207714 and property_type='longitude';		
+	update darwin2.properties set lower_value=5.433333 where lower_value NOT LIKE '%''%' and record_id=159099 and property_type='longitude';		
+	update darwin2.properties set lower_value=54.2 where lower_value NOT LIKE '%''%' and record_id=130623 and property_type='longitude';		
+	update darwin2.properties set lower_value=-3.16667 where lower_value NOT LIKE '%''%' and record_id=198136 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.598889 where lower_value NOT LIKE '%''%' and record_id=205197 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.618334 where lower_value NOT LIKE '%''%' and record_id=203650 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.589166 where lower_value NOT LIKE '%''%' and record_id=205168 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.567778 where lower_value NOT LIKE '%''%' and record_id=205172 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.556389 where lower_value NOT LIKE '%''%' and record_id=204002 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.546666 where lower_value NOT LIKE '%''%' and record_id=205001 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.497777 where lower_value NOT LIKE '%''%' and record_id=203947 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.485 where lower_value NOT LIKE '%''%' and record_id=203997 and property_type='longitude';		
+	update darwin2.properties set lower_value=-4.386944 where lower_value NOT LIKE '%''%' and record_id=205004 and property_type='longitude';		
+	update darwin2.properties set lower_value=-27.9 where lower_value NOT LIKE '%''%' and record_id=208002 and property_type='longitude';		
+	update darwin2.properties set lower_value=-28.6 where lower_value NOT LIKE '%''%' and record_id=208020 and property_type='longitude';		
+	update darwin2.properties set lower_value=-68.533333 where lower_value NOT LIKE '%''%' and record_id=137112 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';		
+	update darwin2.properties set lower_value=-76.066667 where lower_value NOT LIKE '%''%' and record_id=137101 and property_type='longitude';		
+	update darwin2.properties set lower_value=-74.3 where lower_value NOT LIKE '%''%' and record_id=137109 and property_type='longitude';		
+	update darwin2.properties set lower_value=-58.233333 where lower_value NOT LIKE '%''%' and record_id=137116 and property_type='longitude';		
+	update darwin2.properties set lower_value=-16.1666667 where lower_value NOT LIKE '%''%' and record_id=209642 and property_type='latitude';			
+	update darwin2.properties set lower_value=-6.5833333 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='latitude';	
+	update darwin2.properties set lower_value=11.75 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='longitude';		
+	update darwin2.properties set lower_value=-3.16667 where lower_value NOT LIKE '%''%' and record_id=198136 and property_type='latitude';			
+	update darwin2.properties set lower_value=-27.9 where lower_value NOT LIKE '%''%' and record_id=208002 and property_type='longitude';		
+	update darwin2.properties set lower_value=-28.6 where lower_value NOT LIKE '%''%' and record_id=208020 and property_type='longitude';		
+	update darwin2.properties set lower_value=54.2 where lower_value NOT LIKE '%''%' and record_id=130623 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
+	update darwin2.properties set lower_value=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';		
+	update darwin2.properties set lower_value=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';		
+	update darwin2.properties set lower_value=2.85 where lower_value NOT LIKE '%''%' and record_id=207714 and property_type='longitude';		
+	update darwin2.properties set lower_value=-17.06 where lower_value NOT LIKE '%''%' and record_id=137632 and property_type='longitude';		
+	update darwin2.properties set lower_value=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';		
+	update darwin2.properties set lower_value=-6.5833333 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='latitude';	
+	update darwin2.properties set lower_value=11.75 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='longitude';		
+	update darwin2.properties set lower_value=-70.5333333 where lower_value NOT LIKE '%''%' and record_id=208324 and property_type='latitude';	
+	update darwin2.properties set lower_value=-13.45 where lower_value NOT LIKE '%''%' and record_id=208324 and property_type='longitude';		
 
 	update darwin2.gtu set longitude=11.0333335 where id=167181;
 
---fix wrongly spelled coordinates
--- DMS with no minute sign
---e.g : 45 ° 45.333 N
---        45° 45"
 
-UPDATE properties
-SET lower_value=
-REPLACE(REPLACE(regexp_replace(lower_value,'(.+°)(.+)([^''])$', '\1\2''00"\3'),'''''',''''),'""','"'),
-upper_value=
-REPLACE(REPLACE(regexp_replace(upper_value,'(.+°)(.+)([^''])$', '\1\2''00"\3'),'''''',''''),'""','"')
-where 
-(property_type ='latitude_dms'
-or property_type ='longitude_dms')
-and 
-lower_value ~ '°\s*([\.\d]+)[^'']+$'
-OR 
-upper_value ~ '°\s*([\.\d]+)[^'']+$'
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=4.766667 where lower_value NOT LIKE '%''%' and record_id=159557 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=5.433333 where lower_value NOT LIKE '%''%' and record_id=159099 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=4.766667 where lower_value NOT LIKE '%''%' and record_id=159557 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=2.85 where lower_value NOT LIKE '%''%' and record_id=207714 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=5.433333 where lower_value NOT LIKE '%''%' and record_id=159099 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=54.2 where lower_value NOT LIKE '%''%' and record_id=130623 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-3.16667 where lower_value NOT LIKE '%''%' and record_id=198136 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.598889 where lower_value NOT LIKE '%''%' and record_id=205197 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.618334 where lower_value NOT LIKE '%''%' and record_id=203650 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.589166 where lower_value NOT LIKE '%''%' and record_id=205168 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.567778 where lower_value NOT LIKE '%''%' and record_id=205172 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.556389 where lower_value NOT LIKE '%''%' and record_id=204002 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.546666 where lower_value NOT LIKE '%''%' and record_id=205001 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.497777 where lower_value NOT LIKE '%''%' and record_id=203947 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.485 where lower_value NOT LIKE '%''%' and record_id=203997 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-4.386944 where lower_value NOT LIKE '%''%' and record_id=205004 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-27.9 where lower_value NOT LIKE '%''%' and record_id=208002 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-28.6 where lower_value NOT LIKE '%''%' and record_id=208020 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-68.533333 where lower_value NOT LIKE '%''%' and record_id=137112 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-76.066667 where lower_value NOT LIKE '%''%' and record_id=137101 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-74.3 where lower_value NOT LIKE '%''%' and record_id=137109 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-58.233333 where lower_value NOT LIKE '%''%' and record_id=137116 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-16.1666667 where lower_value NOT LIKE '%''%' and record_id=209642 and property_type='latitude';			
+	update darwin2.properties set lower_value_unified=-6.5833333 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='latitude';	
+	update darwin2.properties set lower_value_unified=11.75 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-3.16667 where lower_value NOT LIKE '%''%' and record_id=198136 and property_type='latitude';			
+	update darwin2.properties set lower_value_unified=-27.9 where lower_value NOT LIKE '%''%' and record_id=208002 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-28.6 where lower_value NOT LIKE '%''%' and record_id=208020 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=54.2 where lower_value NOT LIKE '%''%' and record_id=130623 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138186 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138208 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-5.583333 where lower_value NOT LIKE '%''%' and record_id=138510 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=2.85 where lower_value NOT LIKE '%''%' and record_id=207714 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-17.06 where lower_value NOT LIKE '%''%' and record_id=137632 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-67.435277 where lower_value NOT LIKE '%''%' and record_id=181793 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-6.5833333 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='latitude';	
+	update darwin2.properties set lower_value_unified=11.75 where lower_value NOT LIKE '%''%' and record_id=210213 and property_type='longitude';		
+	update darwin2.properties set lower_value_unified=-70.5333333 where lower_value NOT LIKE '%''%' and record_id=208324 and property_type='latitude';	
+	update darwin2.properties set lower_value_unified=-13.45 where lower_value NOT LIKE '%''%' and record_id=208324 and property_type='longitude';	
 
---Convert DMS to DD
-DELETE FROM properties WHERE 
-(property_type ilike 'latitude'
- OR 
- property_type ilike 'longitude')
- and referenced_relation ='gtu'
- and record_id in (select record_id from properties where property_type='latitude_dms' OR property_type = 'longitude_dms' 
-				  and referenced_relation='gtu');
-
-INSERT INTO properties
-(
-	referenced_relation,
-	record_id,  
-	property_type, 
-	applies_to,
-	date_from_mask, 
-	date_from, 
-	date_to_mask,
-	date_to, 
-	is_quantitative,
-	property_unit,
-	method, 
-	lower_value, 
-	upper_value, 
-	property_accuracy,
-	property_type_ref)
-	SELECT
-	
-	referenced_relation,
-		record_id, 
-		property_type, 
-		applies_to, 
-		date_from_mask,
-		date_from, 
-		date_to_mask,
-		date_to,
-		is_quantitative,
-		property_unit,
-		method, 
-		rmca_dms_to_dd(lower_value, REPLACE(property_type, '_dms','')),
-		 COALESCE(rmca_dms_to_dd(upper_value, REPLACE(property_type, '_dms',''))::varchar,''), 
-		property_accuracy, 
-		property_type_ref
-	from properties where property_type='latitude_dms' OR property_type = 'longitude_dms' and referenced_relation='gtu';
-	
 
 
