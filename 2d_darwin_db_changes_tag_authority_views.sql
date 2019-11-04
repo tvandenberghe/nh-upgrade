@@ -12,28 +12,28 @@ CREATE UNIQUE INDEX tag_authority_idx
 
 DROP MATERIALIZED VIEW IF EXISTS darwin2.mv_tag_to_country;
 CREATE MATERIALIZED VIEW darwin2.mv_tag_to_country AS 
+CREATE schema ipt;
+DROP MATERIALIZED VIEW IF EXISTS darwin2.mv_tag_to_country;
+CREATE MATERIALIZED VIEW ipt.mv_tag_to_country AS
 SELECT t1.gtu_ref,
     t1.tag_group_distinct_ref,
     t1.tag_value,
     tacountry.code as country_code_gn,
     tacountry.url as country_url_gn,
     tacountry.pref_label as country_pref_label_gn,
-    tacountry.alternative_representations -> 'ISO 3166-2'::text AS country_iso,
-    hstore(array_agg(COALESCE(coord.property_type::text,'no coords'::text)), array_agg(COALESCE(coord.lower_value::text,'no coords'::text))) as country_coord
+    tacountry.alternative_representations ->> 'iso 3166-2' AS country_iso,
+   jsonb_object(coord.property_type, coord.lower_value) as country_coord
     FROM darwin2.tag_groups t1
     RIGHT JOIN darwin2.tag_groups tcountry ON t1.gtu_ref = tcountry.gtu_ref
     LEFT JOIN darwin2.tag_tag_authority ttacountry ON ttacountry.tag_group_distinct_ref = tcountry.tag_group_distinct_ref
     LEFT JOIN darwin2.tag_authority tacountry ON ttacountry.tag_authority_ref = tacountry.id
-    LEFT JOIN (select record_id,lower_value,property_type from darwin2.properties where referenced_relation='tag_authority' and property_type in ('latitude_wgs_84','longitude_wgs_84') order by property_type ) coord on coord.record_id = tacountry.id
+    LEFT JOIN (select record_id,
+			  array_agg(COALESCE(lower_value::text,'no coords'::text)) lower_value,
+			   array_agg(COALESCE(property_type::text,'no coords'::text)) property_type from darwin2.properties where referenced_relation='tag_authority' and property_type in ('latitude_wgs_84','longitude_wgs_84')  group by record_id ) coord on coord.record_id = tacountry.id
     WHERE t1.tag_value not in ('Oceans','/','?') AND tcountry.sub_group_name_indexed::text = 'country'::text AND tacountry.id IS NOT NULL and t1.sub_group_name_indexed::text not in ('ocean','country','continent') AND t1.id IS NOT NULL
-group by 
-    t1.gtu_ref,
-    t1.tag_group_distinct_ref,
-    t1.tag_value,
-    tacountry.code,
-    tacountry.url,
-    tacountry.pref_label,
-    tacountry.alternative_representations -> 'ISO 3166-2'::text
+
+    
+	
 WITH DATA;
 
 ALTER TABLE darwin2.mv_tag_to_country
