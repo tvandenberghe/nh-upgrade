@@ -31,11 +31,13 @@ example pgfutter --host dddd --db darwin_dev2019 --port 5432 --user postgres --p
 default is to place the file in a new schema named import.
 */
 
-create table taxonomy_authority (
+ DROP table if exists taxonomy_authority  ;
+
+create table taxonomy_authority  (
   id serial NOT NULL, -- Primary key of the authoritative representation of a taxon.
   taxonomy_ref integer NOT NULL, --a reference to a entry in the taxonomy table: these are unique wrt path, name and level (rank)
   domain_ref bigint NOT NULL, -- Reference to the domain (taxonomic backbone) that authored the authoritative representation of a taxon entry.
-  url character varying NOT NULL, -- The url of the taxonomic backbone entry. Mandatory.
+  url character varying  NULL, -- The url of the taxonomic backbone entry. Mandatory.
   urn character varying, -- The urn or pseudo-urn of the taxonomic backbone entry.
   code character varying NOT NULL, -- The internal identifier used in the domain (for example the WORMS Aphia ID).
   pref_label character varying(255), -- The principal name used for the term by the taxonomic backbone.
@@ -150,4 +152,3 @@ DELETE FROM darwin2.taxonomy_authority WHERE taxonomy_ref=235244 and urn='urn:ls
 DELETE FROM darwin2.taxonomy_authority WHERE taxonomy_ref=236058 and urn='urn:lsid:marinespecies.org:taxname:269225';
 DELETE FROM darwin2.taxonomy_authority WHERE taxonomy_ref=236062 and urn='urn:lsid:marinespecies.org:taxname:1043464';
 DELETE FROM darwin2.taxonomy_authority WHERE taxonomy_ref=237776 and urn='urn:lsid:marinespecies.org:taxname:101506';
-
