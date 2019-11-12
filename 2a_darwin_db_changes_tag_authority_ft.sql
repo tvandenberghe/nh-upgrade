@@ -1,4 +1,14 @@
+
 set search_path to darwin2,public;
+
+CREATE TABLE IF NOT EXISTS property_type (
+id serial NOT NULL, --
+type character varying NOT NULL,
+CONSTRAINT property_type_pk PRIMARY KEY (id),
+CONSTRAINT type_uq UNIQUE (type)
+);
+ALTER TABLE darwin2.properties ADD COLUMN property_type_ref bigint, 
+ADD CONSTRAINT fk_property_type_id FOREIGN KEY (property_type_ref) REFERENCES property_type(id);
 
 CREATE TABLE darwin2.tag_group_distinct (
                 id SERIAL NOT NULL,
@@ -19,7 +29,7 @@ COMMENT ON COLUMN darwin2.tag_group_distinct.sub_group_name_indexed IS 'Referenc
 COMMENT ON COLUMN darwin2.tag_group_distinct.group_name_indexed IS 'Reference to the group_name';
 COMMENT ON COLUMN darwin2.tag_group_distinct.tag_value IS 'Textual value of the tag.';
 
-ALTER TABLE darwin2.tag_groups ADD COLUMN tag_group_distinct_ref bigint, 
+ALTER TABLE darwin2.tag_groups  
 ADD CONSTRAINT fk_tag_group_distinct_id FOREIGN KEY (tag_group_distinct_ref) REFERENCES tag_group_distinct(id);
 
 CREATE TABLE darwin2.authority_domain (
@@ -1347,8 +1357,8 @@ or property_type ='longitude_dms')
 and 
 lower_value ~ '°\s*([\.\d]+)[^'']+$'
 OR 
-upper_value ~ '°\s*([\.\d]+)[^'']+$';
-
+upper_value ~ '°\s*([\.\d]+)[^'']+$'
+;
 --Convert DMS to DD
 DELETE FROM properties WHERE 
 (property_type ilike 'latitude'
@@ -1394,5 +1404,4 @@ INSERT INTO properties
 		property_type_ref
 	from properties where property_type='latitude_dms' OR property_type = 'longitude_dms' and referenced_relation='gtu';
 	
-
 
