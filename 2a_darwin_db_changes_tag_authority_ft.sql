@@ -1347,7 +1347,7 @@ or property_type ='longitude_dms')
 and 
 lower_value ~ '°\s*([\.\d]+)[^'']+$'
 OR 
-upper_value ~ '°\s*([\.\d]+)[^'']+$'
+upper_value ~ '°\s*([\.\d]+)[^'']+$';
 
 --Convert DMS to DD
 DELETE FROM properties WHERE 
