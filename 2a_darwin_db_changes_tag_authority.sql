@@ -1321,8 +1321,8 @@ update darwin2.properties set lower_value=-70.5333333 where lower_value NOT LIKE
 
 --KEEP OLD DMS coordinates
 INSERT INTO darwin2.properties(
-	referenced_relation, record_id,  property_type, applies_to, applies_to_indexed, date_from_mask, date_from, date_to_mask, date_to, is_quantitative, property_unit, method, method_indexed, lower_value, lower_value_unified, upper_value, upper_value_unified, property_accuracy, property_type_ref)
-SELECT referenced_relation, record_id,  property_type||'_dms', applies_to, applies_to_indexed, date_from_mask, date_from, date_to_mask, date_to, is_quantitative, property_unit, method, method_indexed, lower_value, lower_value_unified, upper_value, upper_value_unified, property_accuracy, property_type_ref
+	referenced_relation, record_id,  property_type, applies_to, applies_to_indexed, date_from_mask, date_from, date_to_mask, date_to, is_quantitative, property_unit, method, method_indexed, lower_value, lower_value_unified, upper_value, upper_value_unified, property_accuracy)
+SELECT referenced_relation, record_id, property_type||'_dms', applies_to, applies_to_indexed, date_from_mask, date_from, date_to_mask, date_to, is_quantitative, property_unit, method, method_indexed, lower_value, lower_value_unified, upper_value, upper_value_unified, property_accuracy
 	FROM darwin2.properties
 	where referenced_relation='gtu'
 	and (property_type ilike '%latitude%' OR property_type ilike '%longitude%')
@@ -1347,7 +1347,7 @@ or property_type ='longitude_dms')
 and 
 lower_value ~ '°\s*([\.\d]+)[^'']+$'
 OR 
-upper_value ~ '°\s*([\.\d]+)[^'']+$'
+upper_value ~ '°\s*([\.\d]+)[^'']+$';
 
 --Convert DMS to DD
 DELETE FROM properties WHERE 
@@ -1373,8 +1373,7 @@ INSERT INTO properties
 	method, 
 	lower_value, 
 	upper_value, 
-	property_accuracy,
-	property_type_ref)
+	property_accuracy)
 	SELECT
 	
 	referenced_relation,
@@ -1390,9 +1389,139 @@ INSERT INTO properties
 		method, 
 		rmca_dms_to_dd(lower_value, REPLACE(property_type, '_dms','')),
 		 COALESCE(rmca_dms_to_dd(upper_value, REPLACE(property_type, '_dms',''))::varchar,''), 
-		property_accuracy, 
-		property_type_ref
+		property_accuracy
 	from properties where property_type='latitude_dms' OR property_type = 'longitude_dms' and referenced_relation='gtu';
 	
 
+--Further series of xy, WE, NS flipped coordinates
+update gtu set latitude=-46.90,longitude=-75.61083 where gtu.id = (select gtu_ref from specimens s where s.id=626916); 
+update gtu set latitude=49.35,longitude=-1.14 where gtu.id = (select gtu_ref from specimens s where s.id=336592); 
+update gtu set latitude=49.35,longitude=-1.14 where gtu.id = (select gtu_ref from specimens s where s.id=581267); 
+update gtu set latitude=48.34,longitude=-1.58 where gtu.id = (select gtu_ref from specimens s where s.id=402964); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=575512); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=344456); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=485956); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=442802); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=562521); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=447098); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=358557); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=591407); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=397123); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=363353); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=582907); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=594864); 
+update gtu set latitude=49.49,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=548630); 
+update gtu set latitude=49.36,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=596320); 
+update gtu set latitude=49.36,longitude=-1.16 where gtu.id = (select gtu_ref from specimens s where s.id=596321); 
+update gtu set latitude=28.57,longitude=-13.32 where gtu.id = (select gtu_ref from specimens s where s.id=381943); 
+update gtu set latitude=28.57,longitude=-13.32 where gtu.id = (select gtu_ref from specimens s where s.id=586236); 
+update gtu set latitude=26.03,longitude=-14.6 where gtu.id = (select gtu_ref from specimens s where s.id=474181); 
+update gtu set latitude=66.83,longitude=-14.666667 where gtu.id = (select gtu_ref from specimens s where s.id=481332); 
+update gtu set latitude=28.06,longitude=-17.06 where gtu.id = (select gtu_ref from specimens s where s.id=517385); 
+update gtu set latitude=48.36,longitude=-2.11 where gtu.id = (select gtu_ref from specimens s where s.id=507330); 
+update gtu set latitude=48.36,longitude=-2.11 where gtu.id = (select gtu_ref from specimens s where s.id=559767); 
+update gtu set latitude=48.36,longitude=-2.11 where gtu.id = (select gtu_ref from specimens s where s.id=319483); 
+update gtu set latitude=48.36,longitude=-2.11 where gtu.id = (select gtu_ref from specimens s where s.id=401167); 
+update gtu set latitude=48.38,longitude=-2.01 where gtu.id = (select gtu_ref from specimens s where s.id=290796); 
+update gtu set latitude=48.38,longitude=-2.01 where gtu.id = (select gtu_ref from specimens s where s.id=593966); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=564267); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=406377); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=522502); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=556080); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=333355); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=461063); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=471863); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=476869); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=410266); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=417193); 
+update gtu set latitude=48.68,longitude=-3.9167 where gtu.id = (select gtu_ref from specimens s where s.id=447068); 
+update gtu set latitude=48.41,longitude=-3.56 where gtu.id = (select gtu_ref from specimens s where s.id=482406); 
+update gtu set latitude=48.41,longitude=-3.56 where gtu.id = (select gtu_ref from specimens s where s.id=517613); 
+update gtu set latitude=30.00,longitude=-70 where gtu.id = (select gtu_ref from specimens s where s.id=413512); 
+update gtu set latitude=33.00,longitude=-36 where gtu.id = (select gtu_ref from specimens s where s.id=352990); 
+update gtu set latitude=33.00,longitude=-36 where gtu.id = (select gtu_ref from specimens s where s.id=352991); 
+update gtu set latitude=33.00,longitude=-38.6 where gtu.id = (select gtu_ref from specimens s where s.id=347508); 
+update gtu set latitude=33.00,longitude=-38.6 where gtu.id = (select gtu_ref from specimens s where s.id=347509); 
+update gtu set latitude=33.00,longitude=-38.6 where gtu.id = (select gtu_ref from specimens s where s.id=363738); 
+update gtu set latitude=33.00,longitude=-38.6 where gtu.id = (select gtu_ref from specimens s where s.id=363739); 
+update gtu set latitude=33.00,longitude=-38.6 where gtu.id = (select gtu_ref from specimens s where s.id=347832); 
+update gtu set latitude=33.00,longitude=-38.6 where gtu.id = (select gtu_ref from specimens s where s.id=347833); 
+update gtu set latitude=47.43,longitude=-4 where gtu.id = (select gtu_ref from specimens s where s.id=456042); 
+update gtu set latitude=50.40,longitude=-4.116667 where gtu.id = (select gtu_ref from specimens s where s.id=473621); 
+update gtu set latitude=50.40,longitude=-4.116667 where gtu.id = (select gtu_ref from specimens s where s.id=473622); 
+update gtu set latitude=50.40,longitude=-4.116667 where gtu.id = (select gtu_ref from specimens s where s.id=374748); 
+update gtu set latitude=50.40,longitude=-4.116667 where gtu.id = (select gtu_ref from specimens s where s.id=374749); 
+update gtu set latitude=32.00,longitude=-40 where gtu.id = (select gtu_ref from specimens s where s.id=545231); 
+update gtu set latitude=31.00,longitude=-40 where gtu.id = (select gtu_ref from specimens s where s.id=332674); 
+update gtu set latitude=31.00,longitude=-40 where gtu.id = (select gtu_ref from specimens s where s.id=332675); 
+update gtu set latitude=39.00,longitude=-41 where gtu.id = (select gtu_ref from specimens s where s.id=459720); 
+update gtu set latitude=39.00,longitude=-41 where gtu.id = (select gtu_ref from specimens s where s.id=459721); 
+update gtu set latitude=39.00,longitude=-41 where gtu.id = (select gtu_ref from specimens s where s.id=318498); 
+update gtu set latitude=31.00,longitude=-42.516667 where gtu.id = (select gtu_ref from specimens s where s.id=422258); 
+update gtu set latitude=31.00,longitude=-42.516667 where gtu.id = (select gtu_ref from specimens s where s.id=422259); 
+update gtu set latitude=29.00,longitude=-44 where gtu.id = (select gtu_ref from specimens s where s.id=444998); 
+update gtu set latitude=29.00,longitude=-44 where gtu.id = (select gtu_ref from specimens s where s.id=444999); 
+update gtu set latitude=30.00,longitude=-54 where gtu.id = (select gtu_ref from specimens s where s.id=416345); 
+update gtu set latitude=30.00,longitude=-54 where gtu.id = (select gtu_ref from specimens s where s.id=567266); 
+update gtu set latitude=36.17,longitude=-63.583333 where gtu.id = (select gtu_ref from specimens s where s.id=499250); 
+update gtu set latitude=36.17,longitude=-63.583333 where gtu.id = (select gtu_ref from specimens s where s.id=499251); 
+update gtu set latitude=36.17,longitude=-63.583333 where gtu.id = (select gtu_ref from specimens s where s.id=473658); 
+update gtu set latitude=35.12,longitude=-63.583333 where gtu.id = (select gtu_ref from specimens s where s.id=484612); 
+update gtu set latitude=35.12,longitude=-63.583333 where gtu.id = (select gtu_ref from specimens s where s.id=487991); 
+update gtu set latitude=35.12,longitude=-63.583333 where gtu.id = (select gtu_ref from specimens s where s.id=487992); 
+update gtu set latitude=32.88,longitude=-73.866667 where gtu.id = (select gtu_ref from specimens s where s.id=502442); 
+update gtu set latitude=32.88,longitude=-73.866667 where gtu.id = (select gtu_ref from specimens s where s.id=315400); 
+update gtu set latitude=30.92,longitude=-74.216667 where gtu.id = (select gtu_ref from specimens s where s.id=477100); 
+update gtu set latitude=30.92,longitude=-74.216667 where gtu.id = (select gtu_ref from specimens s where s.id=364912); 
+update gtu set latitude=30.37,longitude=-74.066667 where gtu.id = (select gtu_ref from specimens s where s.id=381793); 
+update gtu set latitude=31.42,longitude=-74.1 where gtu.id = (select gtu_ref from specimens s where s.id=408666); 
+update gtu set latitude=32.88,longitude=-73.866667 where gtu.id = (select gtu_ref from specimens s where s.id=507807); 
+update gtu set latitude=30.92,longitude=-74.216667 where gtu.id = (select gtu_ref from specimens s where s.id=351261); 
+update gtu set latitude=29.83,longitude=-74 where gtu.id = (select gtu_ref from specimens s where s.id=416593); 
+update gtu set latitude=25.38,longitude=-77.916667 where gtu.id = (select gtu_ref from specimens s where s.id=424454); 
+update gtu set latitude=30.51,longitude=9.725 where gtu.id = (select gtu_ref from specimens s where s.id=363788); 
+update gtu set latitude=53.40,longitude=0.666667 where gtu.id = (select gtu_ref from specimens s where s.id=581118); 
+update gtu set latitude=53.40,longitude=0.666667 where gtu.id = (select gtu_ref from specimens s where s.id=581119); 
+update gtu set latitude=51.46,longitude=1.57 where gtu.id = (select gtu_ref from specimens s where s.id=324579); 
+update gtu set latitude=54.03,longitude=2.35 where gtu.id = (select gtu_ref from specimens s where s.id=349919); 
+update gtu set latitude=54.03,longitude=2.35 where gtu.id = (select gtu_ref from specimens s where s.id=349920); 
+update gtu set latitude=52.07,longitude=2.683333 where gtu.id = (select gtu_ref from specimens s where s.id=580140); 
+update gtu set latitude=51.46,longitude=1.57 where gtu.id = (select gtu_ref from specimens s where s.id=342192); 
+update gtu set latitude=42.16,longitude=3.11 where gtu.id = (select gtu_ref from specimens s where s.id=509250); 
+update gtu set latitude=42.16,longitude=3.11 where gtu.id = (select gtu_ref from specimens s where s.id=509251); 
+update gtu set latitude=42.16,longitude=3.11 where gtu.id = (select gtu_ref from specimens s where s.id=648453); 
+update gtu set latitude=56.60,longitude=4.366667 where gtu.id = (select gtu_ref from specimens s where s.id=501018); 
+update gtu set latitude=56.60,longitude=4.366667 where gtu.id = (select gtu_ref from specimens s where s.id=501019); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=292164); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=292165); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=331597); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=334196); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=348135); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=357060); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=396413); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=426387); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=426388); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=449239); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=464508); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=499898); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=532043); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=532044); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=533819); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=571555); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=585050); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=644544); 
+update gtu set latitude=43.04,longitude=5.48 where gtu.id = (select gtu_ref from specimens s where s.id=645662); 
+update gtu set latitude=43.05,longitude=5.54 where gtu.id = (select gtu_ref from specimens s where s.id=306846); 
+update gtu set latitude=43.05,longitude=5.54 where gtu.id = (select gtu_ref from specimens s where s.id=325623); 
+update gtu set latitude=43.05,longitude=5.54 where gtu.id = (select gtu_ref from specimens s where s.id=331771); 
+update gtu set latitude=43.05,longitude=5.54 where gtu.id = (select gtu_ref from specimens s where s.id=368192); 
+update gtu set latitude=43.05,longitude=5.54 where gtu.id = (select gtu_ref from specimens s where s.id=558425); 
+update gtu set latitude=43.27,longitude=6.55 where gtu.id = (select gtu_ref from specimens s where s.id=442879); 
+update gtu set latitude=43.27,longitude=6.55 where gtu.id = (select gtu_ref from specimens s where s.id=343784); 
+update gtu set latitude=43.25,longitude=6.46 where gtu.id = (select gtu_ref from specimens s where s.id=375532); 
+update gtu set latitude=43.18,longitude=6.38 where gtu.id = (select gtu_ref from specimens s where s.id=511069); 
+update gtu set latitude=9.00,longitude=75 where gtu.id = (select gtu_ref from specimens s where s.id=422876); 
+update gtu set latitude=39.15,longitude=9.283333 where gtu.id = (select gtu_ref from specimens s where s.id=341264); 
+update gtu set latitude=39.15,longitude=9.283333 where gtu.id = (select gtu_ref from specimens s where s.id=326118); 
+update gtu set latitude=39.15,longitude=9.283333 where gtu.id = (select gtu_ref from specimens s where s.id=507106); 
 

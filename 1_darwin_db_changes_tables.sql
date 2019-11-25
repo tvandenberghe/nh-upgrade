@@ -126,7 +126,7 @@ update collections set title_en='Royal Belgian Institute of Natural Sciences Mol
 update collections set title_en='Royal Belgian Institute of Natural Sciences Pisces collection', title_nl='Vissencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Poissons de l''Institut royal des Sciences naturelles de Belgique' where id=8;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Reptilia collection', title_nl='Reptielencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Reptiles de l''Institut royal des Sciences naturelles de Belgique' where id=9;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Rotifera collection', title_nl='Raderdierencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Rotifères de l''Institut royal des Sciences naturelles de Belgique' where id=238;
-update collections set title_en='Royal Belgian Institute of Natural Sciences Vertebrates/Types collection', title_nl='Vertebraten typecollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des types de les Vertébrés de l''Institut royal des Sciences naturelles de Belgique' where id=10;
+update collections set title_en='Royal Belgian Institute of Natural Sciences vertebrate types collection', title_nl='Vertebraten typecollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des types de les Vertébrés de l''Institut royal des Sciences naturelles de Belgique' where id=10;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Acari collection', title_nl='Mijten- en tekencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Acariens de l''Institut royal des Sciences naturelles de Belgique' where id=27;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Amphibia collection', title_nl='Amfibieëncollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Amphibiens de l''Institut royal des Sciences naturelles de Belgique' where id=5;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Araneae collection', title_nl='Spinnencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Aranéides de l''Institut royal des Sciences naturelles de Belgique' where id=28;
@@ -136,3 +136,18 @@ update collections set title_en='Royal Belgian Institute of Natural Sciences Het
 update collections set title_en='Royal Belgian Institute of Natural Sciences Hymenoptera collection', title_nl='Vliesvleugeligencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Hyménoptères de l''Institut royal des Sciences naturelles de Belgique' where id=32;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Orthoptera collection', title_nl='Rechtvleugeligencollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Orthoptères de l''Institut royal des Sciences naturelles de Belgique' where id=36;
 update collections set title_en='Royal Belgian Institute of Natural Sciences Rhopalocera collection', title_nl='Dagvlindercollectie van het Koninklijk Belgisch Instituut voor Natuurwetenschappen', title_fr='Collection des Rhopalocères de l''Institut royal des Sciences naturelles de Belgique' where id=37;
+
+
+update gtu set code=replace(code,'Vertebrates','VERTEBRATES') where code like 'Vertebrates%';
+update gtu set code=replace(code,'vertebrates','VERTEBRATES') where code like 'vertebrates%';
+update gtu set code=replace(code,'VERTEBRATS','VERTEBRATES') where code like 'VERTEBRATS%';
+update gtu set code=replace(code,'VERTERATES','VERTEBRATES') where code like 'VERTERATES%';
+update gtu set code=replace(code,'VERTREBRATES','VERTEBRATES') where code like 'VERTREBRATES%';
+update gtu set code=replace(code,'VERTYEBRATES','VERTEBRATES') where code like 'VERTYEBRATES%';
+update gtu set code=replace(code,'VRETEBRATES','VERTEBRATES') where code like 'VRETEBRATES%';
+update gtu set code=replace(code,'VRTEBRATES','VERTEBRATES') where code like 'VRTEBRATES%';
+update gtu set code=replace(code,'VETEBRATES','VERTEBRATES') where code like 'VETEBRATES%';
+update gtu set code=replace(code,'VERTEBTATES','VERTEBRATES') where code like 'VERTEBTATES%';
+
+update gtu set latitude =null, longitude=null where id=131934 --wrong, data entry person mapped this to place in england while it's in canada
+

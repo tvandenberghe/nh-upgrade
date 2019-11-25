@@ -16,12 +16,11 @@ $BODY$
 ALTER FUNCTION darwin2.fct_mask_date(timestamp without time zone, integer)
   OWNER TO darwin2;
   
---ALTER VIEW v_darwin_ipt_rbins RENAME TO v_darwin_ipt_rbins_old;
-
 DROP MATERIALIZED VIEW IF EXISTS mv_darwin_ipt_rbins CASCADE;
 DROP VIEW IF EXISTS v_darwin_ipt_rbins;
-CREATE VIEW v_darwin_ipt_rbins AS 
- WITH taxonomy_authority_cte AS (
+
+drop materialized view if exists mv_taxonomy;
+create materialized view mv_taxonomy as (
 SELECT 	t.id AS taxonomy_ref,
         t.name,
         t.status as taxonomic_status,
@@ -56,10 +55,11 @@ SELECT 	t.id AS taxonomy_ref,
         LEFT JOIN darwin2.fct_get_tax_hierarchy(t.id, ARRAY[34]) family on family.r_start_id=t.id
         LEFT JOIN darwin2.fct_get_tax_hierarchy(t.id, ARRAY[41]) genus on genus.r_start_id=t.id     
         LEFT JOIN darwin2.fct_get_tax_hierarchy(t.id, ARRAY[42]) subgenus on subgenus.r_start_id=t.id     
-where t.level_ref = 48
-order by 1
-),
-location_cte as (
+--where t.level_ref = 48
+order by 1);
+
+create view v_darwin_ipt_rbins as
+WITH location_cte as (
 select *,
 case when ndwc_gtu_decimal_latitude is not null then 
 	ndwc_gtu_decimal_latitude 
@@ -125,13 +125,13 @@ order by gtu.id) q
     'http://biocol.org/urn:lsid:biocol.org:col:35271' as old_institution_id,
     'RBINS-Scientific Heritage'::text AS institution_code,
     'RBINS' as owner_institution_code,
-    collections.name_indexed as dataset_id,
-    collections.name AS dataset_name,
+    --'rbins_collections_'||collections.name_indexed as dataset_id,
+    --collections.title_en AS dataset_name,
     'urn:catalog:RBINS:'::text || collections.code::text AS collection_code,
     collections.name AS collection_name,
     'http://collections.naturalsciences.be/'::text || collections.id AS collection_id,
     collections.path||collections.id||'/' AS ndwc_collection_path,
-    string_agg(distinct (((COALESCE(codes.code_prefix, ''::character varying)::text || COALESCE(codes.code_prefix_separator, ''::character varying)::text) || COALESCE(codes.code, ''::character varying)::text) || COALESCE(codes.code_suffix_separator, ''::character varying)::text) || COALESCE(codes.code_suffix, ''::character varying)::text, ','::text) AS catalog_number,
+    string_agg(distinct (((COALESCE(codes.code_prefix, ''::character varying)::text || COALESCE(codes.code_prefix_separator, ''::character varying)::text) || COALESCE(case when codes.code ~ '\d+ ?[a-zA-Z]+' then upper(regexp_replace(codes.code,'(\d+) ([a-zA-Z]+)','\1\2')) else codes.code end, ''::character varying)::text) || COALESCE(codes.code_suffix_separator, ''::character varying)::text) || COALESCE(codes.code_suffix, ''::character varying)::text, ','::text) AS catalog_number,
     'en' as language,
     'https://creativecommons.org/licenses/by-nc/4.0'::text AS license,
     specimens.taxon_name AS scientific_name,
@@ -161,8 +161,9 @@ order by gtu.id) q
            FROM people
           WHERE people.id = ANY (specimens.spec_coll_ids)) AS recorded_by,
     max(identifications.notion_date) as date_identified,
-    COALESCE(specimens.specimen_count_max, specimens.specimen_count_min, 1) AS organism_quantity,
+    CASE COALESCE(specimens.specimen_count_max, specimens.specimen_count_min, 1) WHEN 0 THEN 1 else COALESCE(specimens.specimen_count_max, specimens.specimen_count_min, 1) END AS organism_quantity,
     'SpecimensInContainer'::text AS organism_quantity_type,
+    CASE COALESCE(specimens.specimen_count_max, specimens.specimen_count_min, 1) WHEN 0 THEN 'Database specifies zero specimens for this existing specimen. Organism quantity has been set to 1. ' END as occurrence_remarks, 
     specimens.sex,
     specimens.stage AS life_stage,
     coalesce('container type: '::text||specimens.container_type,'') || coalesce('; sample preparator: '::text||string_agg(mof_preparator.measurement_value,', '),'') || coalesce('; sample preparation: '::text||string_agg(mof_preparation.measurement_value,', '),'') || coalesce('; preservation method: '::text||specimens.container_storage,'') AS preparations,
@@ -192,6 +193,7 @@ order by gtu.id) q
     CASE when specimens.station_visible THEN locations.verbatim_SRS else NULL end as verbatim_SRS, 
     CASE when specimens.station_visible THEN locations.coordinate_uncertainty_in_meters else NULL end as coordinate_uncertainty_in_meters,
     CASE when specimens.station_visible THEN locations.footprint_wkt else NULL end as footprint_wkt,
+    case when specimens.station_visible THEN locations.georeference_remarks else null end as georeference_remarks, 
     elevation.measurement_value as minimum_elevation_in_meters,
     elevation.measurement_value as maximum_elevation_in_meters,
     case 
@@ -207,16 +209,15 @@ order by gtu.id) q
     (SELECT string_agg(people.formated_name::text, ', '::text ORDER BY people.id) AS string_agg
       FROM people
       WHERE people.id = ANY (specimens.spec_ident_ids)) AS identified_by,
-    CASE WHEN specimens.gtu_from_date_mask = 0 THEN 
-		CASE WHEN specimens.gtu_to_date_mask <> 0 then replace(specimens.gtu_to_date::text,'-xx','') 
-		ELSE null
-		END
+    CASE WHEN specimens.gtu_from_date_mask = 0 THEN CASE WHEN specimens.gtu_to_date_mask <> 0 then replace(specimens.gtu_to_date::text,'-xx','') 
+    ELSE CASE WHEN specimens.acquisition_date::text<>'0001-01-01' THEN '1800-01-01/'||specimens.acquisition_date::text END --if from and to date are both empty, then take the acquisition date. If the acquisition date is empty, take the date of inscription in the IG catalog
+    END
     ELSE replace(fct_mask_date(specimens.gtu_from_date, specimens.gtu_from_date_mask),'-xx','') end
     ||
-		CASE WHEN specimens.gtu_from_date = specimens.gtu_to_date or specimens.gtu_to_date_mask = 0 THEN ''
-		ELSE '/'||replace(fct_mask_date(specimens.gtu_to_date, specimens.gtu_to_date_mask),'-xx','')
-    END  AS event_date,
-    specimens.gtu_code as field_number,
+    CASE WHEN specimens.gtu_from_date = specimens.gtu_to_date or specimens.gtu_to_date_mask = 0 or specimens.gtu_from_date_mask = 0 THEN ''
+    ELSE '/'||replace(fct_mask_date(specimens.gtu_to_date, specimens.gtu_to_date_mask),'-xx','') END AS event_date,
+    CASE WHEN specimens.gtu_from_date_mask = 0 AND specimens.gtu_to_date_mask = 0 and specimens.acquisition_date::text<>'0001-01-01' then 'Event date interpreted from date specimen was acquired by the Museum' END as event_remarks,
+    replace(nullif(specimens.gtu_code,'0'),'/ ','/')::character varying AS field_number,
     null as habitat
    FROM specimens
      LEFT JOIN users_tracking specimen_auditing on specimen_auditing.record_id = specimens.id and specimen_auditing.referenced_relation='specimens'
@@ -226,7 +227,7 @@ order by gtu.id) q
      LEFT JOIN gtu ON specimens.gtu_ref = gtu.id
      LEFT JOIN users_tracking gtu_auditing on gtu_auditing.record_id = gtu.id and gtu_auditing.referenced_relation='gtu'
      left join location_cte locations on locations.gtu_ref=gtu.id
-     LEFT JOIN taxonomy_authority_cte taxa ON taxa.taxonomy_ref = specimens.taxon_ref
+     LEFT JOIN mv_taxonomy taxa ON taxa.taxonomy_ref = specimens.taxon_ref
      left join catalogue_bibliography cb on cb.record_id = specimens.id and cb.referenced_relation='specimens'
      left join bibliography b on b.id = cb.bibliography_ref
      left join comments taxon_remarks on taxon_remarks.record_id=taxa.taxonomy_ref and taxon_remarks.referenced_relation='taxonomy' and taxon_remarks.notion_concerned='taxon information'
@@ -243,9 +244,9 @@ order by gtu.id) q
      specimens.station_visible, specimens.type, specimens.taxon_path, specimens.taxon_ref, specimens.specimen_count_max, specimens.specimen_count_min, specimens.sex, specimens.stage, specimens.container_type, specimens.container_storage, 
      specimens.ig_num, ndwc_verbatim_country, locations.verbatim_location, locations.country_code, locations.location, locations.ndwc_nice_verbatim_location, locations.location_id, locations.ndwc_geotypes, locations.country, locations.water_body, 
      locations.island_group, locations.island, locations.decimal_latitude, locations.decimal_longitude, locations.ndwc_tag_decimal_latitude, locations.ndwc_tag_decimal_longitude, locations.ndwc_gtu_decimal_latitude, locations.ndwc_gtu_decimal_longitude, 
-     locations.geodetic_datum, locations.verbatim_SRS, locations.coordinate_uncertainty_in_meters, locations.footprint_wkt, specimens.gtu_from_date_mask, specimens.gtu_from_date, specimens.gtu_to_date_mask, specimens.gtu_to_date, specimens.gtu_ref, 
+     locations.geodetic_datum, locations.verbatim_SRS, locations.coordinate_uncertainty_in_meters, locations.footprint_wkt, locations.georeference_remarks, specimens.gtu_from_date_mask, specimens.gtu_from_date, specimens.gtu_to_date_mask, specimens.gtu_to_date, specimens.gtu_ref, 
      specimens.gtu_code, specimens.specimen_status, taxon_remarks.comment, /*mof_preparation.measurement_value, mof_preparator.measurement_value,*/ elevation.measurement_value, sampling_depth.measurement_value, sampling_depth_min.measurement_value, sampling_depth_max.measurement_value
-     order by occurrence_id;--,LENGTH(b.title), LENGTH(b.abstract);
+     order by occurrence_id;
      
 ALTER TABLE v_darwin_ipt_rbins OWNER TO darwin2;
 GRANT ALL ON TABLE v_darwin_ipt_rbins TO darwin2;
