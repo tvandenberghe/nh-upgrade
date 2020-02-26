@@ -85,7 +85,7 @@ echo "5a-->CREATE TABLES TO BETTER STORE PROPERTIES"
 echo "5b-->CREATE SAMPLING VIEW"
 #psql -h "$server" -d "$db" -U postgres -q  < 5b_darwin_db_changes_sampling_view.sql
 echo "5c-->CREATE MOF VIEW"
-#psql -h "$server" -d "$db" -U postgres -q  < 5c_darwin_db_changes_ipt_mof_view.sql
+psql -h "$server" -d "$db" -U postgres -q  < 5c_darwin_db_changes_ipt_mof_view.sql
 echo "6-->CREATE IPT OCCURRENCE VIEW"
 psql -h "$server" -d "$db" -U postgres -q  < 6_darwin_db_changes_ipt_view.sql
 echo "7-->CREATE IPT VIEW PER DATASET"
@@ -93,12 +93,12 @@ psql -h "$server" -d "$db" -U postgres -q  < 7_ipt_views_per_dataset.sql
 echo "8-->CREATE EML VIEW"
 psql -h "$server" -d "$db" -U postgres -q  < 8_darwin_eml_view.sql
 
-psql -h "$server" -d "$db" -U postgres -c "
-DROP ROLE IF EXISTS iptreader;
-create user iptreader;
-GRANT SELECT ON ALL TABLES IN SCHEMA darwin2 TO iptreader;
-GRANT USAGE ON SCHEMA darwin2 TO iptreader;
-"
+#psql -h "$server" -d "$db" -U postgres -c "
+#DROP ROLE IF EXISTS iptreader;
+#create user iptreader;
+#GRANT SELECT ON ALL TABLES IN SCHEMA darwin2 TO iptreader;
+#GRANT USAGE ON SCHEMA darwin2 TO iptreader;
+#"
 
 #--DROP VIEW IF EXISTS darwin2.v_darwin_ipt_rbins_mof;
 #DETAIL:  view v_darwin_ipt_rbins_mof depends on materialized view darwin2.mv_properties

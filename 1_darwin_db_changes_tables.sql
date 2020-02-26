@@ -149,5 +149,11 @@ update gtu set code=replace(code,'VRTEBRATES','VERTEBRATES') where code like 'VR
 update gtu set code=replace(code,'VETEBRATES','VERTEBRATES') where code like 'VETEBRATES%';
 update gtu set code=replace(code,'VERTEBTATES','VERTEBRATES') where code like 'VERTEBTATES%';
 
-update gtu set latitude =null, longitude=null where id=131934 --wrong, data entry person mapped this to place in england while it's in canada
+update gtu set latitude=null, longitude=null where id=131934 --wrong, data entry person mapped this to place in england while it's in canada
+update gtu set latitude=null, longitude=null where id=121530 --wrong, location in South Africa set to 0-0.
 
+delete from properties where record_id=131934 and referenced_relation='gtu' and property_type='latitude';  --remove a 0-0 coordinate from the properties, for Canada
+delete from properties where record_id=131934 and referenced_relation='gtu' and property_type='longitude'  --remove a 0-0 coordinate from the properties, for Canada
+
+delete from properties where record_id=121530 and referenced_relation='gtu' and property_type='latitude';  --remove a 0-0 coordinate from the properties, for South Africa
+delete from properties where record_id=121530 and referenced_relation='gtu' and property_type='longitude'  --remove a 0-0 coordinate from the properties, for South Africa

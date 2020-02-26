@@ -23,7 +23,7 @@ CREATE OR REPLACE view darwin2.be_rbins_entomology_hymenoptera as select 'be_rbi
 CREATE OR REPLACE view darwin2.be_rbins_entomology_orthoptera as select 'be_rbins_entomology_orthoptera' as dataset_id, 'Royal Belgian Institute of Natural Sciences Orthoptera Collection' as dataset_name, occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='orthoptera';
 CREATE OR REPLACE view darwin2.be_rbins_entomology_rhopalocera as select 'be_rbins_entomology_rhopalocera' as dataset_id, 'Royal Belgian Institute of Natural Sciences Rhopalocera Collection' as dataset_name, occ.* from darwin2.mv_darwin_ipt_rbins occ left join darwin2.collections c on ndwc_collection_path LIKE '%/'||c.id||'/%' where /*scientific_name_id is not null and decimal_latitude is not null and*/ name_indexed='rhopalocera';
 
-CREATE OR REPLACE view darwin2.darwin_complete as select * from darwin2.mv_darwin_ipt_rbins;
+CREATE OR REPLACE view darwin2.be_rbins_darwin as select 'be_rbins_darwin'::text AS dataset_id,'Royal Belgian Institute of Natural Sciences Collection'::text AS dataset_name,* from darwin2.mv_darwin_ipt_rbins;
 /*------------------------*/
 
 CREATE OR REPLACE view darwin2.be_rbins_vertebrates_aves_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.be_rbins_vertebrates_aves occ on occ.occurrence_id=mof.occurrence_id;
@@ -51,7 +51,7 @@ CREATE OR REPLACE view darwin2.be_rbins_entomology_hymenoptera_mof as select mof
 CREATE OR REPLACE view darwin2.be_rbins_entomology_orthoptera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.be_rbins_entomology_orthoptera occ on occ.occurrence_id=mof.occurrence_id;
 CREATE OR REPLACE view darwin2.be_rbins_entomology_rhopalocera_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof inner join darwin2.be_rbins_entomology_rhopalocera occ on occ.occurrence_id=mof.occurrence_id;
 
-CREATE OR REPLACE view darwin2.darwin_complete_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof;
+CREATE OR REPLACE view darwin2.be_rbins_darwin_mof as select mof.* from darwin2.mv_darwin_ipt_rbins_mof mof;
 
 GRANT SELECT ON darwin2.be_rbins_vertebrates_aves TO iptreader;
 GRANT SELECT ON darwin2.be_rbins_invertebrates_belgianmarineinvertebrates TO iptreader;
@@ -77,7 +77,7 @@ GRANT SELECT ON darwin2.be_rbins_entomology_hymenoptera TO iptreader;
 GRANT SELECT ON darwin2.be_rbins_entomology_orthoptera TO iptreader;
 GRANT SELECT ON darwin2.be_rbins_entomology_rhopalocera TO iptreader;
 
-GRANT SELECT ON darwin2.darwin_complete TO iptreader;
+GRANT SELECT ON darwin2.be_rbins_darwin TO iptreader;
 
 GRANT SELECT ON darwin2.be_rbins_vertebrates_aves_mof TO iptreader;
 GRANT SELECT ON darwin2.be_rbins_invertebrates_belgianmarineinvertebrates_mof TO iptreader;
@@ -103,5 +103,5 @@ GRANT SELECT ON darwin2.be_rbins_entomology_hymenoptera_mof TO iptreader;
 GRANT SELECT ON darwin2.be_rbins_entomology_orthoptera_mof TO iptreader;
 GRANT SELECT ON darwin2.be_rbins_entomology_rhopalocera_mof TO iptreader;
 
-GRANT SELECT ON darwin2.darwin_complete_mof TO iptreader;
+GRANT SELECT ON darwin2.be_rbins_darwin_mof TO iptreader;
 
