@@ -1,29 +1,10 @@
 set search_path to darwin2,public;
-drop materialized view if exists mv_darwin_ipt_rbins_mof CASCADE;
-drop view if exists v_darwin_ipt_rbins_mof;
+drop materialized view if exists ipt.mv_darwin_ipt_rbins_mof CASCADE;
+drop view if exists ipt.v_darwin_ipt_rbins_mof;
 
-create view v_darwin_ipt_rbins_mof as 
-/*
-with marine_collections as select id from collections where name_indexed in ((Asteroidea
-Belgian Marine Invertebrates
-Belgian Marine Invertebrates Not visible
-Brachiopoda
-Crinoidea
-Echinoidea
-Holothuroidea
-Ophiuroidea
-Pycnogonida
-Sipuncula
+CREATE SCHEMA IF NOT EXISTS ipt;
 
-SELECT count(*), source,dataset_id,measurement_unit,s.collection_name
-  FROM darwin_complete_mof m
-  left join darwin_complete o on o.occurrence_id=m.occurrence_id
-  left join specimens s on s.id::text=replace(m.occurrence_id,'http://collections.naturalsciences.be/specimen/','')
-  where measurement_type='sampling_elevation' 
-  group by source,dataset_id,measurement_unit,s.collection_name
-  order by dataset_id,source
-*/
-
+create view ipt.v_darwin_ipt_rbins_mof as 
 with sampling_depth_range_cte as (
 select distinct 'prop_depth_range_'||source as source, 'http://collections.naturalsciences.be/specimen/'::text || specimen_ref::character varying::text AS occurrence_id, null,property_type_id_internal as measurement_type,property_type_id, 
 value,value as orig_value, 'm'::text as measurement_unit
@@ -174,8 +155,5 @@ from sampling_depth_range_cte) q --inner join q as q2 on q.occurrence_id=q2.occu
 where occurrence_id is not null and (measurement_value_id is null or measurement_value_id like 'http%')
 order by occurrence_id, measurement_type, measurement_type_id,measurement_unit,source desc;
 
-create materialized view mv_darwin_ipt_rbins_mof as 
-select * from v_darwin_ipt_rbins_mof
-
---where (measurement_type like '%elevation%' and cast(measurement_value as double precision) <=8800) or (measurement_type like '%depth%' and cast(measurement_value as double precision) <=11000) or measurement_type not like '%elevation%' or measurement_type not like '%depth%'
-
+create materialized view ipt.mv_darwin_ipt_rbins_mof as 
+select * from ipt.v_darwin_ipt_rbins_mof

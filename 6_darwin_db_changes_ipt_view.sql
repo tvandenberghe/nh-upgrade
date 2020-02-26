@@ -16,8 +16,11 @@ $BODY$
 ALTER FUNCTION darwin2.fct_mask_date(timestamp without time zone, integer)
   OWNER TO darwin2;
   
-DROP MATERIALIZED VIEW IF EXISTS mv_darwin_ipt_rbins CASCADE;
-DROP VIEW IF EXISTS v_darwin_ipt_rbins;
+DROP MATERIALIZED VIEW IF EXISTS darwin2.mv_darwin_ipt_rbins CASCADE;
+DROP VIEW IF EXISTS darwin2.v_darwin_ipt_rbins;
+
+DROP MATERIALIZED VIEW IF EXISTS ipt.mv_darwin_ipt_rbins CASCADE;
+DROP VIEW IF EXISTS ipt.v_darwin_ipt_rbins;
 
 drop materialized view if exists mv_taxonomy;
 create materialized view mv_taxonomy as (
@@ -58,7 +61,7 @@ SELECT 	t.id AS taxonomy_ref,
 --where t.level_ref = 48
 order by 1);
 
-create view v_darwin_ipt_rbins as
+create view ipt.v_darwin_ipt_rbins as
 WITH location_cte as (
 select *,
 case when ndwc_gtu_decimal_latitude is not null then 
@@ -113,7 +116,7 @@ order by gtu.id) q
 
 )
 
- SELECT distinct string_agg(DISTINCT specimens.id::character varying::text, ','::text) AS ids,
+SELECT distinct string_agg(DISTINCT specimens.id::character varying::text, ','::text) AS ids,
     'PhysicalObject' as type,
     'http://collections.naturalsciences.be/specimen/'::text || specimens.id::text AS occurrence_id,
     min(specimens.specimen_creation_date) as ndwc_created,
@@ -248,7 +251,7 @@ order by gtu.id) q
      specimens.gtu_code, specimens.specimen_status, taxon_remarks.comment, /*mof_preparation.measurement_value, mof_preparator.measurement_value,*/ elevation.measurement_value, sampling_depth.measurement_value, sampling_depth_min.measurement_value, sampling_depth_max.measurement_value
      order by occurrence_id;
      
-ALTER TABLE v_darwin_ipt_rbins OWNER TO darwin2;
-GRANT ALL ON TABLE v_darwin_ipt_rbins TO darwin2;
+ALTER TABLE ipt.v_darwin_ipt_rbins OWNER TO darwin2;
+GRANT ALL ON TABLE ipt.v_darwin_ipt_rbins TO darwin2;
 
-create materialized view mv_darwin_ipt_rbins as select * from v_darwin_ipt_rbins;
+create materialized view ipt.mv_darwin_ipt_rbins as select * from ipt.v_darwin_ipt_rbins;
